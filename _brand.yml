@@ -1,0 +1,59 @@
+# Visual identity of the calculator. tools/build_theme.R turns this file into
+# the CSS variables in R/app_theme.R, so the app needs no Sass compilation at
+# run time (the Shinylive build runs R in the browser).
+#
+# Typography follows Quarto's default HTML output: the system sans-serif
+# (gothic) stack, on a white page. Colors come from the JAMA palette, as in
+# ggsci::pal_jama(): Limed Spruce, Anzac, Cerulean, Apple Blossom, Acapulco,
+# Kimberly, and Makara.
+meta:
+  name: ARPI treatment effect calculator
+  link: https://github.com/wfukuokaya/mhspcarpi
+
+color:
+  palette:
+    ink: "#212529"
+    ink-secondary: "#495057"
+    ink-muted: "#6c757d"
+    white: "#ffffff"
+    surface-muted: "#f8f9fa"
+    hairline: "#dee2e6"
+    neutral-mark: "#ced4da"
+    limed-spruce: "#374E55"
+    anzac: "#DF8F44"
+    cerulean: "#00A1D5"
+    apple-blossom: "#B24745"
+    acapulco: "#79AF97"
+    kimberly: "#6A6599"
+    makara: "#80796B"
+    # Shades of the JAMA colors for hover states and warning text.
+    spruce-deep: "#293a40"
+    anzac-ink: "#765535"
+    anzac-wash: "#fbefe5"
+  foreground: ink
+  background: white
+  primary: limed-spruce
+  secondary: ink-secondary
+  success: acapulco
+  info: cerulean
+  warning: anzac
+  danger: apple-blossom
+  light: surface-muted
+  dark: ink
+
+typography:
+  fonts:
+    - family: system-ui
+      source: system
+  base:
+    family: system-ui
+    size: 16px
+    line-height: 1.5
+  headings:
+    family: system-ui
+    weight: 600
+    line-height: 1.2
+    color: ink
+  link:
+    color: limed-spruce
+    decoration: underline

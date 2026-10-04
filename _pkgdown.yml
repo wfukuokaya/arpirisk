@@ -1,0 +1,20 @@
+url: https://wfukuokaya.github.io/mhspcarpi/
+template:
+  bootstrap: 5
+
+reference:
+  - title: Predictions
+    contents:
+      - predict_baseline_risk
+      - estimate_treatment_effect
+      - treatment_effect_curve
+      - plot_treatment_effect
+  - title: Inputs and model
+    contents:
+      - model_inputs
+      - check_inputs
+      - mhspc_model
+      - example_patients
+  - title: Calculator
+    contents:
+      - run_app

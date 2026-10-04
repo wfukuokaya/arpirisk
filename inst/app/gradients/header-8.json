@@ -1,0 +1,87 @@
+{
+  "base": "#00A1D5",
+  "generator_version": "1.0.0",
+  "height": 420,
+  "layers": [
+    {
+      "color": "#00A1D5",
+      "fx": "-0.159490",
+      "id": "radial_0",
+      "transform": "translate(734.614020 190.315621) rotate(298.987659) skewX(-8.208688) scale(1275.986155 271.368477)"
+    },
+    {
+      "color": "#B24745",
+      "fx": "-0.144986",
+      "id": "radial_1",
+      "transform": "translate(31.986090 112.042334) rotate(136.467152) skewX(-7.725381) scale(1206.131090 420.433503)"
+    },
+    {
+      "color": "#374E55",
+      "fx": "0.114780",
+      "id": "radial_2",
+      "transform": "translate(1586.563835 26.497246) rotate(237.903542) skewX(-3.231228) scale(1376.134370 310.213078)"
+    },
+    {
+      "color": "#374E55",
+      "fx": "0.267631",
+      "id": "radial_3",
+      "transform": "translate(796.128856 272.882974) rotate(51.169672) skewX(-8.712530) scale(1601.099968 353.122674)"
+    },
+    {
+      "color": "#6A6599",
+      "fx": "-0.128608",
+      "id": "radial_4",
+      "transform": "translate(781.866928 81.418679) rotate(262.418926) skewX(7.619194) scale(1636.835460 352.581975)"
+    },
+    {
+      "color": "#00A1D5",
+      "fx": "0.121287",
+      "id": "radial_5",
+      "transform": "translate(570.714782 368.792132) rotate(35.141936) skewX(3.803625) scale(987.980586 391.502013)"
+    },
+    {
+      "color": "#6A6599",
+      "fx": "0.005874",
+      "id": "radial_6",
+      "transform": "translate(1519.999571 354.267046) rotate(54.057553) skewX(0.574404) scale(1282.897123 272.506113)"
+    },
+    {
+      "color": "#374E55",
+      "fx": "-0.292850",
+      "id": "radial_7",
+      "transform": "translate(114.273331 379.352665) rotate(79.183811) skewX(-5.122274) scale(1285.933785 378.271903)"
+    },
+    {
+      "color": "#6A6599",
+      "fx": "-0.194849",
+      "id": "radial_8",
+      "transform": "translate(549.170044 112.073765) rotate(300.353834) skewX(7.829354) scale(1218.721485 310.154471)"
+    },
+    {
+      "color": "#B24745",
+      "fx": "-0.119973",
+      "id": "radial_9",
+      "transform": "translate(634.022309 69.796294) rotate(72.650973) skewX(5.329495) scale(1410.537139 435.717561)"
+    },
+    {
+      "color": "#B24745",
+      "fx": "-0.053939",
+      "id": "radial_10",
+      "transform": "translate(21.148202 321.005230) rotate(156.818627) skewX(-5.365615) scale(1153.452740 266.732974)"
+    },
+    {
+      "color": "#00A1D5",
+      "fx": "-0.236086",
+      "id": "radial_11",
+      "transform": "translate(713.685386 175.543849) rotate(34.240219) skewX(-8.294883) scale(1350.806975 291.636303)"
+    }
+  ],
+  "palette": [
+    "#374E55",
+    "#00A1D5",
+    "#B24745",
+    "#6A6599"
+  ],
+  "seed": 8,
+  "width": 1600
+}

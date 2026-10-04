@@ -1,0 +1,7 @@
+.Rproj.user
+.Rhistory
+.RData
+_site/
+docs/
+*.Rcheck/
+mhspcarpi_*.tar.gz
