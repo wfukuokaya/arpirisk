@@ -9,10 +9,12 @@
 #
 # Usage, from the package root:
 #   Rscript data-raw/build_model_spec.R ../260906_eu/model_export.txt
+# An optional second argument writes the specification elsewhere; the
+# synthetic-cohort check (data-raw/synthetic_cohort_check.R) uses it.
 
 args <- commandArgs(trailingOnly = TRUE)
 export_path <- if (length(args) >= 1L) args[[1L]] else "../260906_eu/model_export.txt"
-spec_path <- file.path("inst", "extdata", "model_spec.json")
+spec_path <- if (length(args) >= 2L) args[[2L]] else file.path("inst", "extdata", "model_spec.json")
 
 export <- readRDS(export_path)
 

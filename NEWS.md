@@ -3,6 +3,14 @@
 * First version: baseline risk, treatment effects across baseline risk, input
   checks, plotting, and a Shiny calculator exportable with Shinylive. Model
   version 260803-raw-rcs.
+* A synthetic-cohort check (`data-raw/synthetic_cohort_check.R`) runs the
+  analysis export code on simulated trials; the package reproduces `rms`
+  predictions to 1e-9. It showed that the exported linear-predictor center
+  must match `survival::coxph()`, which uses 0 as the reference for 0/1 and
+  factor columns. With the `rms` center, predicted risks were too low (34%
+  versus 45% observed in the simulation). The model specification built from
+  the 260803 export has this problem; it is fixed in 261002_script.R and
+  checked by `data-raw/remote_golden_cases.R`.
 * `treatment_effect_curve()` returns the pooled effect curves for custom
   figures and tables.
 * `example_patients` provides 6 synthetic patients spanning the range of

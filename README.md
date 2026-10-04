@@ -61,7 +61,7 @@ The visual identity is defined in `_brand.yml` (brand.yml format: colors, fonts,
 
 The model is stored as aggregate parameters in `inst/extdata/model_spec.json`: risk-model coefficients and spline knots, the 4-year baseline cumulative hazards from the multiply imputed datasets, and the pooled treatment-effect curves. No participant-level data are included.
 
-The specification is generated from the analysis export with `data-raw/build_model_spec.R`. Tests check the package against reference profiles scored by the analysis code and, when available, against golden cases computed with `rms` on the analysis computer (`data-raw/remote_golden_cases.R`).
+The specification is generated from the analysis export with `data-raw/build_model_spec.R`. Tests check the package against reference profiles scored by the analysis code and, when available, against golden cases computed with `rms` on the analysis computer (`data-raw/remote_golden_cases.R`). `data-raw/synthetic_cohort_check.R` runs the analysis export code on a simulated cohort; the tests compare the package with `rms` predictions and with the true risks of that simulation.
 
 ## Citation
 

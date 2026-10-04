@@ -2,8 +2,8 @@
 #
 # Run this in the same R session immediately after the analysis script (for
 # example 261002_script.R) finishes, so that fit_pooled, model_export, mv_fits,
-# knots_pooled, data_model, calculate_absolute_mortality_risk(), and
-# reconstruct_curve() are available. It scores fixed synthetic profiles defined
+# knots_pooled, data_model, base_completed, patient_risk,
+# calculate_absolute_mortality_risk(), and reconstruct_curve() are available. It scores fixed synthetic profiles defined
 # below, so it uses no participant-level data, and it runs in seconds.
 #
 # The expected values come from rms::predict() on the fitted model and from the
@@ -59,13 +59,32 @@ if (anyNA(model_scale$NUM_BONE_CAT)) {
   stop("Bone metastasis categories did not match the fitted factor levels.")
 }
 
-# predict(type = "lp") is centered at fit_pooled$center, which the export stores
-# as lp_center; the shrinkage factor is then applied as in the export.
-if (!isTRUE(all.equal(as.numeric(fit_pooled$center), model_export$lp_center))) {
-  stop("fit_pooled$center does not match model_export$lp_center.")
+# predict(type = "lp") is centered at fit_pooled$center; it is re-centered at
+# the exported lp_center, and the shrinkage factor is applied as in the export.
+exported_lp <- function(newdata) {
+  model_export$shrinkage_factor * (
+    as.numeric(predict(fit_pooled, newdata = newdata, type = "lp")) +
+      as.numeric(fit_pooled$center) - model_export$lp_center
+  )
 }
-linear_predictor <- model_export$shrinkage_factor *
-  as.numeric(predict(fit_pooled, newdata = model_scale, type = "lp"))
+linear_predictor <- exported_lp(model_scale)
+
+# The baseline hazards and the effect curves were estimated on the shrunken
+# linear predictor of survival::coxph(), which uses 0 rather than the mean as the
+# reference for 0/1 and factor columns. The exported linear predictor must be on
+# that scale; a mean difference above 0.01 means the exported center is wrong.
+alignment <- purrr::map_dbl(utils::head(sort(unique(patient_risk$imp)), 5L), function(m) {
+  dat_arm0 <- base_completed[[m]]
+  dat_arm0$ARM <- 0L
+  mean(exported_lp(dat_arm0) - patient_risk$lp_shrunk[patient_risk$imp == m])
+})
+writeLines(sprintf(
+  "Mean difference between the exported and the analysis linear predictor: %.4f.",
+  mean(alignment)
+))
+if (abs(mean(alignment)) > 0.01) {
+  stop("The exported lp_center is not aligned with the baseline hazards and effect curves.")
+}
 baseline_risk <- calculate_absolute_mortality_risk(
   lp = linear_predictor,
   baseline_hazards = model_export$baseline_hazards
