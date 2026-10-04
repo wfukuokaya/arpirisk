@@ -1,0 +1,13 @@
+bibentry(
+  bibtype = "Manual",
+  title = "{mhspcarpi}: ARPI Treatment Effects by Baseline Risk in Metastatic Prostate Cancer",
+  author = person("Wataru", "Fukuokaya"),
+  year = "2026",
+  note = paste("R package version", meta$Version),
+  url = "https://github.com/wfukuokaya/mhspcarpi",
+  textVersion = paste0(
+    "Fukuokaya W (2026). mhspcarpi: ARPI Treatment Effects by Baseline Risk in ",
+    "Metastatic Prostate Cancer. R package version ", meta$Version, ". ",
+    "https://github.com/wfukuokaya/mhspcarpi"
+  )
+)

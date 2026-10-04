@@ -1,9 +1,11 @@
 # Builds the static calculator with Shinylive and deploys it to Cloudflare
 # Pages. Requires the repository secrets CLOUDFLARE_API_TOKEN and
-# CLOUDFLARE_ACCOUNT_ID, and a Cloudflare Pages project named below.
+# CLOUDFLARE_ACCOUNT_ID, and a Cloudflare Pages project named below. It runs
+# when a release is published or when started by hand, so that a model under
+# revision is never deployed by an ordinary push.
 on:
-  push:
-    branches: [main]
+  release:
+    types: [published]
   workflow_dispatch:
 
 name: deploy-app

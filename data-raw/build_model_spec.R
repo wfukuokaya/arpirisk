@@ -7,13 +7,17 @@
 # term, so a renamed or missing term stops the build instead of silently
 # contributing zero to the linear predictor.
 #
-# Usage, from the package root:
-#   Rscript data-raw/build_model_spec.R ../260906_eu/model_export.txt
+# Usage, from the package root, with the export from the analysis run (it is
+# not part of this repository):
+#   Rscript data-raw/build_model_spec.R path/to/model_export.txt
 # An optional second argument writes the specification elsewhere; the
 # synthetic-cohort check (data-raw/synthetic_cohort_check.R) uses it.
 
 args <- commandArgs(trailingOnly = TRUE)
-export_path <- if (length(args) >= 1L) args[[1L]] else "../260906_eu/model_export.txt"
+if (length(args) < 1L || !file.exists(args[[1L]])) {
+  cli::cli_abort("Give the path to the analysis export (model_export.txt) as the first argument.")
+}
+export_path <- args[[1L]]
 spec_path <- if (length(args) >= 2L) args[[2L]] else file.path("inst", "extdata", "model_spec.json")
 
 export <- readRDS(export_path)

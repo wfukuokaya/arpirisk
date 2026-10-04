@@ -18,8 +18,9 @@
 #   cohort_cases.csv  300 simulated patients scored with rms::predict()
 # tests/testthat/test-synthetic.R compares the package with these files.
 #
-# Usage, from the package root (takes about 1 to 2 minutes):
-#   Rscript data-raw/synthetic_cohort_check.R ../261002_functions.R
+# Usage, from the package root, with the functions file of the analysis code
+# (it is not part of this repository); takes about 1 to 2 minutes:
+#   Rscript data-raw/synthetic_cohort_check.R path/to/261002_functions.R
 
 suppressPackageStartupMessages({
   library(rms)
@@ -27,7 +28,10 @@ suppressPackageStartupMessages({
 })
 
 args <- commandArgs(trailingOnly = TRUE)
-functions_path <- if (length(args) >= 1L) args[[1L]] else file.path("..", "261002_functions.R")
+if (length(args) < 1L || !file.exists(args[[1L]])) {
+  cli::cli_abort("Give the path to the analysis functions file (for example 261002_functions.R).")
+}
+functions_path <- args[[1L]]
 output_dir <- file.path("tests", "testthat", "fixtures", "synthetic")
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 

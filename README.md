@@ -1,5 +1,9 @@
 # mhspcarpi
 
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/wfukuokaya/mhspcarpi/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/wfukuokaya/mhspcarpi/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
 mhspcarpi implements a risk model for patients with metastatic hormone-sensitive prostate cancer (mHSPC) and the treatment effects of androgen receptor pathway inhibitors (ARPIs) across baseline risk. The model was developed from individual participant data of 4706 patients in 4 placebo-controlled randomized clinical trials (LATITUDE, ARCHES, TITAN, and ARASENS).
 
 For each patient, the package estimates:
@@ -10,6 +14,8 @@ For each patient, the package estimates:
 The package also contains the web calculator, which runs entirely in the browser as a static Shinylive site.
 
 For research and education. The calculator is not a medical device.
+
+> **Status: pre-publication.** The model in `inst/extdata/model_spec.json` (version 260803-raw-rcs) is provisional. Its linear-predictor center does not match the scale of its baseline hazards, so its predicted risks are too low; the corrected export from the next analysis run will replace it. Do not use the current estimates.
 
 ## Installation
 
@@ -51,7 +57,7 @@ The calculator takes the 9 inputs, with unit switches for laboratory values and 
 Rscript tools/build_shinylive.R _site
 ```
 
-The command exports the calculator, with WebAssembly builds of its R dependencies, to `_site/` for static hosting. The GitHub Actions workflow in `.github/workflows/deploy-app.yaml` deploys the site to Cloudflare Pages.
+The command exports the calculator, with WebAssembly builds of its R dependencies, to `_site/` for static hosting. The GitHub Actions workflow in `.github/workflows/deploy-app.yaml` deploys the site to Cloudflare Pages when a release is published or when it is started by hand; it needs the repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`.
 
 ### Design
 
@@ -63,6 +69,40 @@ The model is stored as aggregate parameters in `inst/extdata/model_spec.json`: r
 
 The specification is generated from the analysis export with `data-raw/build_model_spec.R`. Tests check the package against reference profiles scored by the analysis code and, when available, against golden cases computed with `rms` on the analysis computer (`data-raw/remote_golden_cases.R`). `data-raw/synthetic_cohort_check.R` runs the analysis export code on a simulated cohort; the tests compare the package with `rms` predictions and with the true risks of that simulation.
 
+## Updating the model
+
+The analysis runs on a separate computer with the participant-level data; this repository receives only its aggregate export.
+
+1. After the analysis script finishes, run `data-raw/remote_golden_cases.R` in the same R session. It writes `golden_cases.csv` and stops if the exported linear predictor is not aligned with the baseline hazards and effect curves.
+2. Rebuild the specification: `Rscript data-raw/build_model_spec.R path/to/model_export.txt`.
+3. Copy `golden_cases.csv` to `tests/testthat/fixtures/` and run the tests.
+4. Update the version and `NEWS.md`, then rebuild the calculator.
+
+## Repository layout
+
+| Path | Contents |
+|---|---|
+| `R/` | Package functions and the Shiny calculator |
+| `inst/extdata/model_spec.json` | Model specification (aggregate parameters) |
+| `inst/app/gradients/` | Header artwork for the calculator |
+| `data-raw/` | Scripts that build the specification, golden cases, the synthetic-cohort check, and `example_patients` |
+| `tools/` | Scripts that build the calculator theme, header artwork, and Shinylive site |
+| `tests/testthat/` | Tests, with synthetic fixtures in `fixtures/synthetic/` |
+| `vignettes/` | "Get started" vignette |
+| `_brand.yml` | Visual identity of the calculator |
+
+## Development
+
+```r
+testthat::test_local()
+lintr::lint_package()
+rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"))
+```
+
+## Data
+
+No participant-level data are included. The model specification contains aggregate parameters only, and all test fixtures are simulated.
+
 ## Citation
 
-The citation will be added on publication.
+`citation("mhspcarpi")` gives the package citation. The article will be added on publication.

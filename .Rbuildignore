@@ -12,3 +12,6 @@
 ^\.lintr$
 ^_brand\.yml$
 ^\.zenodo\.json$
+^cran-comments\.md$
+^CRAN-SUBMISSION$
+^\.DS_Store$
