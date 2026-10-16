@@ -1,6 +1,6 @@
 Package: mhspcarpi
 Title: ARPI Treatment Effects by Baseline Risk in Metastatic Prostate Cancer
-Version: 0.1.0.9000
+Version: 0.1.0
 Authors@R:
     person("Wataru", "Fukuokaya", email = "wfukuokaya@gmail.com",
            role = c("aut", "cre"))
@@ -15,7 +15,9 @@ Description: Implements a risk model, developed from individual participant
     calculator is included and can be exported as a static 'Shinylive' web
     application.
 License: MIT + file LICENSE
-URL: https://github.com/wfukuokaya/mhspcarpi, https://wfukuokaya.github.io/mhspcarpi/
+URL: https://github.com/wfukuokaya/mhspcarpi,
+    https://wfukuokaya.github.io/mhspcarpi/,
+    https://arpi-treatment-effect-estimator.pages.dev/
 BugReports: https://github.com/wfukuokaya/mhspcarpi/issues
 Encoding: UTF-8
 Language: en-US

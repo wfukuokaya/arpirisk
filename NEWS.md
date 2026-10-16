@@ -1,4 +1,4 @@
-# mhspcarpi 0.1.0.9000
+# mhspcarpi 0.1.0
 
 * Model version 261002-raw-rcs replaces 260803-raw-rcs. Its linear-predictor
   center matches the baseline hazards, which raises predicted risks; the

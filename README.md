@@ -11,11 +11,11 @@ For each patient, the package estimates:
 - the risk of death within 4 years with placebo plus androgen deprivation therapy (ADT), called baseline risk; and
 - the pooled effects of an ARPI plus ADT versus placebo plus ADT at that baseline risk: the difference in the probability of being alive at 4 years, the restricted mean survival time difference through 4 years, and the hazard ratio, each with a 95% confidence interval and a 95% prediction interval.
 
-The package also contains the web calculator, which runs entirely in the browser as a static Shinylive site.
+The package also contains the web calculator, which runs entirely in the browser as a static Shinylive site: <https://arpi-treatment-effect-estimator.pages.dev/>.
 
 For research and education. The calculator is not a medical device.
 
-> **Status: pre-publication.** The model in `inst/extdata/model_spec.json` (version 261002-raw-rcs) reproduces the reference profiles scored by the analysis code, but it has not yet been checked against the `rms` golden cases from the same analysis run (`data-raw/remote_golden_cases.R`). Do not use the estimates clinically.
+> **Status:** version 0.1.0 accompanies a manuscript under peer review and uses model version 261002-raw-rcs. The package reproduces the reference profiles scored by the analysis code; the check against `rms` golden cases from the same analysis run (`data-raw/remote_golden_cases.R`) is pending.
 
 ## Installation
 
