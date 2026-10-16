@@ -1,5 +1,8 @@
 # mhspcarpi 0.1.0.9000
 
+* Model version 261002-raw-rcs replaces 260803-raw-rcs. Its linear-predictor
+  center matches the baseline hazards, which raises predicted risks; the
+  example patient in the tests moves from 53% to 62%.
 * First version: baseline risk, treatment effects across baseline risk, input
   checks, plotting, and a Shiny calculator exportable with Shinylive. Model
   version 260803-raw-rcs.

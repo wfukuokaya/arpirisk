@@ -15,7 +15,7 @@ The package also contains the web calculator, which runs entirely in the browser
 
 For research and education. The calculator is not a medical device.
 
-> **Status: pre-publication.** The model in `inst/extdata/model_spec.json` (version 260803-raw-rcs) is provisional. Its linear-predictor center does not match the scale of its baseline hazards, so its predicted risks are too low; the corrected export from the next analysis run will replace it. Do not use the current estimates.
+> **Status: pre-publication.** The model in `inst/extdata/model_spec.json` (version 261002-raw-rcs) reproduces the reference profiles scored by the analysis code, but it has not yet been checked against the `rms` golden cases from the same analysis run (`data-raw/remote_golden_cases.R`). Do not use the estimates clinically.
 
 ## Installation
 

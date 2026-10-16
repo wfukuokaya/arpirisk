@@ -12,8 +12,8 @@ example_patient <- function(...) {
 # Below the 1st percentile of baseline risk in the trials.
 low_risk_patient <- function() {
   example_patient(
-    gleason_score = 7, bone_metastases = 0, psa = 5, hemoglobin = 150,
-    albumin = 46, alp = 70, ldh = 160
+    gleason_score = 7, bone_metastases = 0, psa = 2, hemoglobin = 150,
+    albumin = 48, alp = 60, ldh = 160
   )
 }
 
