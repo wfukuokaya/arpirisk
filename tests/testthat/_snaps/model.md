@@ -3,7 +3,7 @@
     Code
       print(mhspc_model())
     Message
-      mHSPC ARPI treatment-effect model (260803-raw-rcs)
+      mHSPC ARPI treatment-effect model (261002-raw-rcs)
       * Baseline risk: All-cause death within 4 years with Placebo plus ADT.
       * Inputs: ecog_ps, gleason_score, visceral_metastasis, bone_metastases, psa,
         hemoglobin, albumin, alp, and ldh.
