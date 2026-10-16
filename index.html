@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">mhspcarpi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,14 +50,19 @@
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="mhspcarpi">mhspcarpi<a class="anchor" aria-label="anchor" href="#mhspcarpi"></a>
 </h1></div>
+<!-- badges: start -->
+
 <p>mhspcarpi implements a risk model for patients with metastatic hormone-sensitive prostate cancer (mHSPC) and the treatment effects of androgen receptor pathway inhibitors (ARPIs) across baseline risk. The model was developed from individual participant data of 4706 patients in 4 placebo-controlled randomized clinical trials (LATITUDE, ARCHES, TITAN, and ARASENS).</p>
 <p>For each patient, the package estimates:</p>
 <ul>
 <li>the risk of death within 4 years with placebo plus androgen deprivation therapy (ADT), called baseline risk; and</li>
 <li>the pooled effects of an ARPI plus ADT versus placebo plus ADT at that baseline risk: the difference in the probability of being alive at 4 years, the restricted mean survival time difference through 4 years, and the hazard ratio, each with a 95% confidence interval and a 95% prediction interval.</li>
 </ul>
-<p>The package also contains the web calculator, which runs entirely in the browser as a static Shinylive site.</p>
+<p>The package also contains the web calculator, which runs entirely in the browser as a static Shinylive site: <a href="https://arpi-treatment-effect-estimator.pages.dev/" class="external-link uri">https://arpi-treatment-effect-estimator.pages.dev/</a>.</p>
 <p>For research and education. The calculator is not a medical device.</p>
+<blockquote>
+<p><strong>Status:</strong> version 0.1.0 accompanies a manuscript under peer review and uses model version 261002-raw-rcs. The package reproduces the reference profiles scored by the analysis code; the check against <code>rms</code> golden cases from the same analysis run (<code>data-raw/remote_golden_cases.R</code>) is pending.</p>
+</blockquote>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -94,7 +99,7 @@
 </h2>
 <p>The calculator takes the 9 inputs, with unit switches for laboratory values and a definition behind each input, and shows the baseline risk, the expected outcomes for 100 patients, and the treatment effect across baseline risk. A query string fills the inputs (for example <code>?psa=45&amp;hemoglobin=128</code>, in the units listed by <code><a href="reference/model_inputs.html">model_inputs()</a></code>). The coefficients are shown in the “Model specification” panel.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="ex">Rscript</span> tools/build_shinylive.R _site</span></code></pre></div>
-<p>The command exports the calculator, with WebAssembly builds of its R dependencies, to <code>_site/</code> for static hosting. The GitHub Actions workflow in <code>.github/workflows/deploy-app.yaml</code> deploys the site to Cloudflare Pages.</p>
+<p>The command exports the calculator, with WebAssembly builds of its R dependencies, to <code>_site/</code> for static hosting. The GitHub Actions workflow in <code>.github/workflows/deploy-app.yaml</code> deploys the site to Cloudflare Pages when a release is published or when it is started by hand; it needs the repository secrets <code>CLOUDFLARE_API_TOKEN</code> and <code>CLOUDFLARE_ACCOUNT_ID</code>.</p>
 <div class="section level3">
 <h3 id="design">Design<a class="anchor" aria-label="anchor" href="#design"></a>
 </h3>
@@ -108,9 +113,83 @@
 <p>The specification is generated from the analysis export with <code>data-raw/build_model_spec.R</code>. Tests check the package against reference profiles scored by the analysis code and, when available, against golden cases computed with <code>rms</code> on the analysis computer (<code>data-raw/remote_golden_cases.R</code>). <code>data-raw/synthetic_cohort_check.R</code> runs the analysis export code on a simulated cohort; the tests compare the package with <code>rms</code> predictions and with the true risks of that simulation.</p>
 </div>
 <div class="section level2">
+<h2 id="updating-the-model">Updating the model<a class="anchor" aria-label="anchor" href="#updating-the-model"></a>
+</h2>
+<p>The analysis runs on a separate computer with the participant-level data; this repository receives only its aggregate export.</p>
+<ol style="list-style-type: decimal">
+<li>After the analysis script finishes, run <code>data-raw/remote_golden_cases.R</code> in the same R session. It writes <code>golden_cases.csv</code> and stops if the exported linear predictor is not aligned with the baseline hazards and effect curves.</li>
+<li>Rebuild the specification: <code>Rscript data-raw/build_model_spec.R path/to/model_export.txt</code>.</li>
+<li>Copy <code>golden_cases.csv</code> to <code>tests/testthat/fixtures/</code> and run the tests.</li>
+<li>Update the version and <code>NEWS.md</code>, then rebuild the calculator.</li>
+</ol>
+</div>
+<div class="section level2">
+<h2 id="repository-layout">Repository layout<a class="anchor" aria-label="anchor" href="#repository-layout"></a>
+</h2>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr>
+<th>Path</th>
+<th>Contents</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><code>R/</code></td>
+<td>Package functions and the Shiny calculator</td>
+</tr>
+<tr>
+<td><code>inst/extdata/model_spec.json</code></td>
+<td>Model specification (aggregate parameters)</td>
+</tr>
+<tr>
+<td><code>inst/app/gradients/</code></td>
+<td>Header artwork for the calculator</td>
+</tr>
+<tr>
+<td><code>data-raw/</code></td>
+<td>Scripts that build the specification, golden cases, the synthetic-cohort check, and <code>example_patients</code>
+</td>
+</tr>
+<tr>
+<td><code>tools/</code></td>
+<td>Scripts that build the calculator theme, header artwork, and Shinylive site</td>
+</tr>
+<tr>
+<td><code>tests/testthat/</code></td>
+<td>Tests, with synthetic fixtures in <code>fixtures/synthetic/</code>
+</td>
+</tr>
+<tr>
+<td><code>vignettes/</code></td>
+<td>“Get started” vignette</td>
+</tr>
+<tr>
+<td><code>_brand.yml</code></td>
+<td>Visual identity of the calculator</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level2">
+<h2 id="development">Development<a class="anchor" aria-label="anchor" href="#development"></a>
+</h2>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_package.html" class="external-link">test_local</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">lintr</span><span class="fu">::</span><span class="fu">lint_package</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">rcmdcheck</span><span class="fu">::</span><span class="fu">rcmdcheck</span><span class="op">(</span>args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"--no-manual"</span>, <span class="st">"--as-cran"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a>
+</h2>
+<p>No participant-level data are included. The model specification contains aggregate parameters only, and all test fixtures are simulated.</p>
+</div>
+<div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
 </h2>
-<p>The citation will be added on publication.</p>
+<p><code>citation("mhspcarpi")</code> gives the package citation. The article will be added on publication.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
@@ -144,7 +223,12 @@
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/wfukuokaya/mhspcarpi/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/wfukuokaya/mhspcarpi/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+</ul>
+</div>
 
   </aside>
 </div>

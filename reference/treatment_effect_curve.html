@@ -11,7 +11,7 @@ plot_treatment_effect() draws the same curves."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">mhspcarpi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,19 +78,19 @@ Hazard ratios are on the natural scale.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">curve</span> <span class="op">&lt;-</span> <span class="fu">treatment_effect_curve</span><span class="op">(</span><span class="st">"ard"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">curve</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   linear_predictor baseline_risk scale     estimate    conf_low  conf_high</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1       -0.7083770     0.1874087   ard -0.009148616 -0.11314296 0.09484573</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2       -0.6804668     0.1921675   ard -0.003419776 -0.10245456 0.09561500</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3       -0.6525567     0.1970319   ard  0.002309064 -0.09183016 0.09644828</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4       -0.6246465     0.2020034   ard  0.008037904 -0.08128028 0.09735609</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5       -0.5967364     0.2070835   ard  0.013766744 -0.07081767 0.09835116</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6       -0.5688262     0.2122737   ard  0.019495585 -0.06045784 0.09944901</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       -0.7167630     0.1863059   ard -0.012105244 -0.11741399 0.09320350</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       -0.6886720     0.1910711   ard -0.006184372 -0.10643886 0.09407012</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       -0.6605811     0.1959429   ard -0.000263500 -0.09552845 0.09500145</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4       -0.6324902     0.2009229   ard  0.005657372 -0.08469347 0.09600821</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5       -0.6043992     0.2060126   ard  0.011578244 -0.07394692 0.09710341</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6       -0.5763083     0.2112134   ard  0.017499116 -0.06330466 0.09830290</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     pred_low pred_high</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 -0.2374402 0.2191430</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2 -0.2208240 0.2139845</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -0.2043483 0.2089664</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 -0.1880362 0.2041120</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 -0.1719156 0.1994491</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6 -0.1560207 0.1950118</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 -0.2432823 0.2190718</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 -0.2262661 0.2138974</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -0.2093921 0.2088651</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 -0.1926836 0.2039983</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 -0.1761693 0.1993257</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 -0.1598838 0.1948821</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -69,5 +69,5 @@ patient <- data.frame(
 )
 predict_baseline_risk(patient)
 #>   row linear_predictor baseline_risk in_effect_range notes
-#> 1   1        0.5761384        0.5275            TRUE  <NA>
+#> 1   1        0.8187273     0.6160547            TRUE  <NA>
 ```

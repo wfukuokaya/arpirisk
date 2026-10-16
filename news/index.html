@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mhspcarpi</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,8 +34,9 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.1.0.9000" id="mhspcarpi-0109000">mhspcarpi 0.1.0.9000<a class="anchor" aria-label="anchor" href="#mhspcarpi-0109000"></a></h2>
-<ul><li>First version: baseline risk, treatment effects across baseline risk, input checks, plotting, and a Shiny calculator exportable with Shinylive. Model version 260803-raw-rcs.</li>
+<h2 class="pkg-version" data-toc-text="0.1.0" id="mhspcarpi-010">mhspcarpi 0.1.0<a class="anchor" aria-label="anchor" href="#mhspcarpi-010"></a></h2>
+<ul><li>Model version 261002-raw-rcs replaces 260803-raw-rcs. Its linear-predictor center matches the baseline hazards, which raises predicted risks; the example patient in the tests moves from 53% to 62%.</li>
+<li>First version: baseline risk, treatment effects across baseline risk, input checks, plotting, and a Shiny calculator exportable with Shinylive. Model version 260803-raw-rcs.</li>
 <li>A synthetic-cohort check (<code>data-raw/synthetic_cohort_check.R</code>) runs the analysis export code on simulated trials; the package reproduces <code>rms</code> predictions to 1e-9. It showed that the exported linear-predictor center must match <code><a href="https://rdrr.io/pkg/survival/man/coxph.html" class="external-link">survival::coxph()</a></code>, which uses 0 as the reference for 0/1 and factor columns. With the <code>rms</code> center, predicted risks were too low (34% versus 45% observed in the simulation). The model specification built from the 260803 export has this problem; it is fixed in 261002_script.R and checked by <code>data-raw/remote_golden_cases.R</code>.</li>
 <li>
 <code><a href="../reference/treatment_effect_curve.html">treatment_effect_curve()</a></code> returns the pooled effect curves for custom figures and tables.</li>

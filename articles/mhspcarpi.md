@@ -82,19 +82,19 @@ which treatment effects were estimated.
 risk <- predict_baseline_risk(example_patients)
 risk
 #>   row linear_predictor baseline_risk in_effect_range
-#> 1   1       -0.9130882     0.1555849           FALSE
-#> 2   2       -0.6475616     0.1979137            TRUE
-#> 3   3        0.5761384     0.5275000            TRUE
-#> 4   4        1.4173830     0.8242210            TRUE
-#> 5   5        1.2584077     0.7730558            TRUE
-#> 6   6        2.0277171     0.9592382            TRUE
+#> 1   1       -0.6579870     0.1963982            TRUE
+#> 2   2       -0.3946690     0.2476209            TRUE
+#> 3   3        0.8187273     0.6160547            TRUE
+#> 4   4        1.6781886     0.8956950            TRUE
+#> 5   5        1.5096961     0.8519254            TRUE
+#> 6   6        2.2931052     0.9846912           FALSE
 #>                                                                                                                                             notes
-#> 1 Baseline risk is outside the range in which treatment effects were estimated (19% to 96%); effects are shown at the nearest edge of that range.
+#> 1                                                                                                                                            <NA>
 #> 2                                                                                                                                            <NA>
 #> 3                                                                                                                                            <NA>
 #> 4                                                                                                                                            <NA>
 #> 5                                                                                                                                            <NA>
-#> 6                                                                                                                                            <NA>
+#> 6 Baseline risk is outside the range in which treatment effects were estimated (19% to 96%); effects are shown at the nearest edge of that range.
 ```
 
 ## Treatment effects
@@ -109,19 +109,19 @@ years, `rmst` is the difference in restricted mean survival time through
 
 effects <- estimate_treatment_effect(example_patients, scale = c("ard", "rmst"))
 effects[c("row", "baseline_risk", "scale", "estimate", "conf_low", "conf_high")]
-#>    row baseline_risk scale     estimate    conf_low  conf_high
-#> 1    1     0.1555849   ard -0.009148616 -0.11314296 0.09484573
-#> 2    1     0.1555849  rmst  0.522817473 -1.68428270 2.72991764
-#> 3    2     0.1979137   ard  0.003334344 -0.08994206 0.09661075
-#> 4    2     0.1979137  rmst  0.607792586 -1.36662444 2.58220961
-#> 5    3     0.5275000   ard  0.160044393  0.11780614 0.20228265
-#> 6    3     0.5275000  rmst  4.316026384  3.14596907 5.48608369
-#> 7    4     0.8242210   ard  0.137412348  0.08649917 0.18832552
-#> 8    4     0.8242210  rmst  4.553175470  2.76740957 6.33894137
-#> 9    5     0.7730558   ard  0.143118134  0.09281376 0.19342251
-#> 10   5     0.7730558  rmst  4.903008734  3.35721259 6.44880487
-#> 11   6     0.9592382   ard  0.114637434  0.01840863 0.21086624
-#> 12   6     0.9592382  rmst  2.961227900 -0.96782352 6.89027932
+#>    row baseline_risk scale     estimate      conf_low  conf_high
+#> 1    1     0.1963982   ard 0.0002832789 -0.0945278628 0.09509442
+#> 2    1     0.1963982  rmst 0.6177354572 -1.3767451335 2.61221605
+#> 3    2     0.2476209   ard 0.0556955429  0.0009928562 0.11039823
+#> 4    2     0.2476209  rmst 0.9992638106 -0.1532595655 2.15178719
+#> 5    3     0.6160547   ard 0.1564764237  0.1044090043 0.20854384
+#> 6    3     0.6160547  rmst 5.0448803573  3.5714696551 6.51829106
+#> 7    4     0.8956950   ard 0.1276327083  0.0643407300 0.19092469
+#> 8    4     0.8956950  rmst 3.9459309396  1.4116989980 6.48016288
+#> 9    5     0.8519254   ard 0.1339398816  0.0803733946 0.18750637
+#> 10   5     0.8519254  rmst 4.3633263343  2.3639661945 6.36268647
+#> 11   6     0.9846912   ard 0.1131768664  0.0145535338 0.21180020
+#> 12   6     0.9846912  rmst 2.9881088602 -1.0341336556 7.01035138
 ```
 
 Patients whose baseline risk falls outside the 1st to 99th percentiles
@@ -161,19 +161,19 @@ plot_treatment_effect(example_patients[2, ], scale = "ard")
 curve <- treatment_effect_curve("rmst")
 head(curve)
 #>   linear_predictor baseline_risk scale  estimate   conf_low conf_high  pred_low
-#> 1       -0.7083770     0.1874087  rmst 0.5228175 -1.6842827  2.729918 -4.921992
-#> 2       -0.6804668     0.1921675  rmst 0.5618153 -1.5374800  2.661111 -4.624828
-#> 3       -0.6525567     0.1970319  rmst 0.6008132 -1.3922767  2.593903 -4.330827
-#> 4       -0.6246465     0.2020034  rmst 0.6398111 -1.2489425  2.528565 -4.040507
-#> 5       -0.5967364     0.2070835  rmst 0.6788089 -1.1078051  2.465423 -3.754493
-#> 6       -0.5688262     0.2122737  rmst 0.7178068 -0.9692634  2.404877 -3.473547
+#> 1       -0.7167630     0.1863059  rmst 0.5330103 -1.6883115  2.754332 -4.998805
+#> 2       -0.6886720     0.1910711  rmst 0.5735032 -1.5384792  2.685486 -4.693962
+#> 3       -0.6605811     0.1959429  rmst 0.6139960 -1.3902587  2.618251 -4.392274
+#> 4       -0.6324902     0.2009229  rmst 0.6544889 -1.2439247  2.552902 -4.094262
+#> 5       -0.6043992     0.2060126  rmst 0.6949818 -1.0998107  2.489774 -3.800559
+#> 6       -0.5763083     0.2112134  rmst 0.7354746 -0.9583243  2.429274 -3.511933
 #>   pred_high
-#> 1  5.967627
-#> 2  5.748459
-#> 3  5.532453
-#> 4  5.320129
-#> 5  5.112111
-#> 6  4.909160
+#> 1  6.064826
+#> 2  5.840968
+#> 3  5.620266
+#> 4  5.403240
+#> 5  5.190522
+#> 6  4.982883
 ```
 
 ## The calculator
@@ -194,7 +194,7 @@ with the package. No participant-level data are included.
 ``` r
 
 mhspc_model()
-#> mHSPC ARPI treatment-effect model (260803-raw-rcs)
+#> mHSPC ARPI treatment-effect model (261002-raw-rcs)
 #> • Baseline risk: All-cause death within 4 years with Placebo plus ADT.
 #> • Inputs: ecog_ps, gleason_score, visceral_metastasis, bone_metastases, psa,
 #>   hemoglobin, albumin, alp, and ldh.

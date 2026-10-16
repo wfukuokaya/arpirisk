@@ -26,17 +26,17 @@ Created in `data-raw/example_patients.R`.
 ``` r
 predict_baseline_risk(example_patients)
 #>   row linear_predictor baseline_risk in_effect_range
-#> 1   1       -0.9130882     0.1555849           FALSE
-#> 2   2       -0.6475616     0.1979137            TRUE
-#> 3   3        0.5761384     0.5275000            TRUE
-#> 4   4        1.4173830     0.8242210            TRUE
-#> 5   5        1.2584077     0.7730558            TRUE
-#> 6   6        2.0277171     0.9592382            TRUE
+#> 1   1       -0.6579870     0.1963982            TRUE
+#> 2   2       -0.3946690     0.2476209            TRUE
+#> 3   3        0.8187273     0.6160547            TRUE
+#> 4   4        1.6781886     0.8956950            TRUE
+#> 5   5        1.5096961     0.8519254            TRUE
+#> 6   6        2.2931052     0.9846912           FALSE
 #>                                                                                                                                             notes
-#> 1 Baseline risk is outside the range in which treatment effects were estimated (19% to 96%); effects are shown at the nearest edge of that range.
+#> 1                                                                                                                                            <NA>
 #> 2                                                                                                                                            <NA>
 #> 3                                                                                                                                            <NA>
 #> 4                                                                                                                                            <NA>
 #> 5                                                                                                                                            <NA>
-#> 6                                                                                                                                            <NA>
+#> 6 Baseline risk is outside the range in which treatment effects were estimated (19% to 96%); effects are shown at the nearest edge of that range.
 ```
