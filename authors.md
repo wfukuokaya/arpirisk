@@ -7,7 +7,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/wfukuokaya/mhspcarpi/blob/v0.1.0/inst/CITATION)
+[`inst/CITATION`](https://github.com/wfukuokaya/mhspcarpi/blob/main/inst/CITATION)
 
 Fukuokaya W (2026). mhspcarpi: ARPI Treatment Effects by Baseline Risk
 in Metastatic Prostate Cancer. R package version 0.1.0.
