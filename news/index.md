@@ -5,6 +5,12 @@
 - Calculator: the treatment-effect plot keeps a 4:3 shape as the window
   resizes, between 320 and 560 pixels tall, instead of a fixed 300
   pixels.
+- Calculator: the hazard ratio for death, with its 95% CI, is shown
+  beside the absolute treatment effects; the 2 risks and the 3 treatment
+  effects now take one row each.
+- Plot labels have a thin white outline instead of a white box, and the
+  “This patient” label is placed above or below the curve, whichever
+  keeps it closer to the marker without crossing the curve.
 
 ## mhspcarpi 0.1.0
 
