@@ -160,15 +160,18 @@ fieldset.input-block legend {
 @media (min-width: 640px) {
   .value-boxes { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 }
+/* From 1140px: the 2 risks share the first row, the 3 treatment effects the second. */
 @media (min-width: 1140px) {
-  .value-boxes { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+  .value-boxes { grid-template-columns: repeat(6, minmax(0, 1fr)) !important; }
+  .value-boxes > * { grid-column: span 2; }
+  .value-boxes > :nth-child(-n + 2) { grid-column: span 3; }
 }
 .bslib-value-box {
   border: 0 !important; border-top: 2px solid var(--ink) !important; border-radius: 0 !important;
   background: transparent !important; box-shadow: none !important;
 }
 .bslib-value-box > .card-body { padding: 0; }
-.bslib-value-box .value-box-area { padding: 0.6rem 0.2rem 0.5rem; }
+.bslib-value-box .value-box-area { padding: 0.6rem 0.2rem 0.5rem; justify-content: flex-start; }
 .bslib-value-box .value-box-title { font-size: 0.85rem; color: var(--ink-secondary); margin-bottom: 0.35rem; }
 .bslib-value-box .value-box-value {
   font-size: 2.1rem; font-weight: 600; line-height: 1.05;

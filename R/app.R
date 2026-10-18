@@ -236,6 +236,11 @@ results_ui <- function(model) {
           title = "Additional time alive over 4 years with an ARPI",
           value = shiny::uiOutput("rmst_value", inline = TRUE),
           shiny::tags$p(class = "value-box-detail", shiny::textOutput("rmst_detail", inline = TRUE))
+        ),
+        bslib::value_box(
+          title = "Hazard ratio for death with an ARPI",
+          value = shiny::textOutput("hr_value", inline = TRUE),
+          shiny::tags$p(class = "value-box-detail", shiny::textOutput("hr_detail", inline = TRUE))
         )
       ),
       bslib::layout_column_wrap(
@@ -571,6 +576,15 @@ app_server <- function(model) {
       shiny::req(estimates())
       effect <- estimates()$effects$rmst
       format_interval(effect$conf_low, effect$conf_high, digits = 1)
+    })
+    output$hr_value <- shiny::renderText({
+      shiny::req(estimates())
+      format_number(estimates()$effects$hr$estimate, 2)
+    })
+    output$hr_detail <- shiny::renderText({
+      shiny::req(estimates())
+      effect <- estimates()$effects$hr
+      format_interval(effect$conf_low, effect$conf_high, digits = 2)
     })
 
     output$icon_array <- shiny::renderUI({

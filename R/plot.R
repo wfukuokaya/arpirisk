@@ -209,7 +209,8 @@ draw_effect_plot <- function(curve,
       side <- if (patients$risk_percent < mean(x_limits)) "right" else "left"
       draw_label(
         patients$risk_percent, patients$estimate, "This patient",
-        side = side, style = style, color = style$ink, font = 2, gap = 0.1
+        side = side, style = style, color = style$ink, font = 2, gap = 0.1,
+        clear_of = list(x = x, y = curve$estimate)
       )
     }
   }
@@ -245,21 +246,36 @@ label_cex <- function(label, width_inches, cex = 0.95, attempts = 4L) {
   label_cex(label, width_inches, cex * width_inches / needed * 0.98, attempts - 1L)
 }
 
-# Text on a surface-colored box, offset above and to one side of (x, y). Sizes
-# are computed in inches so the box also works on a log-scale axis.
-draw_label <- function(x, y, label, side, style, color, font = 1, cex = 0.85, gap = 0.04) {
+# Text with a thin surface-colored halo, offset above and to one side of (x, y).
+# The halo keeps the text legible over the curve and bands without hiding them
+# behind a box. `clear_of` is a line (x and y in user coordinates) that the text
+# must not cross where they share a horizontal span; the text goes above or
+# below that line, whichever keeps it closer to (x, y). Sizes are computed in
+# inches so this also works on a log-scale axis.
+draw_label <- function(x, y, label, side, style, color, font = 1, cex = 0.85, gap = 0.04,
+                       clear_of = NULL) {
   width <- graphics::strwidth(label, units = "inches", cex = cex, font = font)
-  height <- graphics::strheight(label, units = "inches", cex = cex, font = font)
-  pad <- 0.03
+  halo <- 0.022
   x_inches <- graphics::grconvertX(x, "user", "inches")
   y_inches <- graphics::grconvertY(y, "user", "inches")
   left <- if (side == "right") x_inches + gap else x_inches - gap - width
   bottom <- y_inches + 0.05
   to_x <- function(value) graphics::grconvertX(value, "inches", "user")
   to_y <- function(value) graphics::grconvertY(value, "inches", "user")
-  graphics::rect(
-    to_x(left - pad), to_y(bottom - pad), to_x(left + width + pad), to_y(bottom + height + pad),
-    col = style$surface, border = NA
+  if (!is.null(clear_of)) {
+    span <- to_x(c(left, left + width))
+    under <- clear_of$y[clear_of$x >= span[[1L]] & clear_of$x <= span[[2L]]]
+    ends <- stats::approx(clear_of$x, clear_of$y, xout = span, rule = 2)$y
+    line_inches <- graphics::grconvertY(c(under, ends), "user", "inches")
+    height <- graphics::strheight(label, units = "inches", cex = cex, font = font)
+    above <- max(bottom, max(line_inches) + 0.06)
+    below <- min(y_inches - 0.05, min(line_inches) - 0.06) - height
+    bottom <- if (above - y_inches <= y_inches - (below + height)) above else below
+  }
+  angles <- seq(0, 2 * pi, length.out = 17L)[-17L]
+  graphics::text(
+    to_x(left + halo * cos(angles)), to_y(bottom + halo * sin(angles)), label,
+    adj = c(0, 0), cex = cex, font = font, col = style$surface
   )
   graphics::text(to_x(left), to_y(bottom), label, adj = c(0, 0), cex = cex, font = font, col = color)
 }
