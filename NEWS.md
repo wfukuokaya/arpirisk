@@ -1,3 +1,8 @@
+# mhspcarpi (development version)
+
+* Calculator: the treatment-effect plot keeps a 4:3 shape as the window
+  resizes, between 320 and 560 pixels tall, instead of a fixed 300 pixels.
+
 # mhspcarpi 0.1.0
 
 * Model version 261002-raw-rcs replaces 260803-raw-rcs. Its linear-predictor

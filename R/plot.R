@@ -130,6 +130,16 @@ effect_plot_par <- function() {
   )
 }
 
+# Height of the calculator's effect plot in pixels: a 4:3 shape that follows the
+# card width, kept between 320 and 560 pixels. Before the width is known, the
+# plot is 320 pixels tall.
+effect_plot_height <- function(width) {
+  if (length(width) != 1L || !is.finite(width)) {
+    return(320)
+  }
+  round(min(max(0.75 * width, 320), 560))
+}
+
 hr_ticks <- function(limits) {
   candidates <- c(0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.25, 1.5, 2)
   inside <- candidates[candidates >= limits[[1L]] & candidates <= limits[[2L]]]

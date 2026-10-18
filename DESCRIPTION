@@ -1,6 +1,6 @@
 Package: mhspcarpi
 Title: ARPI Treatment Effects by Baseline Risk in Metastatic Prostate Cancer
-Version: 0.1.0
+Version: 0.1.0.9000
 Authors@R:
     person("Wataru", "Fukuokaya", email = "wfukuokaya@gmail.com",
            role = c("aut", "cre"))

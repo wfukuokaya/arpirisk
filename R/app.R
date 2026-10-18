@@ -264,7 +264,7 @@ results_ui <- function(model) {
           bslib::card_body(
             shiny::plotOutput(
               "effect_plot",
-              height = "300px",
+              height = "auto",
               hover = shiny::hoverOpts("effect_hover", delay = 80, delayType = "throttle"),
               click = "effect_click"
             ),
@@ -592,7 +592,7 @@ app_server <- function(model) {
       )
       graphics::par(effect_plot_par())
       draw_effect_plot(curve, scale, patients = patient, overall = overall_effect(model, scale))
-    }, res = 96)
+    }, height = function() effect_plot_height(session$clientData$output_effect_plot_width), res = 96)
 
     clicked <- shiny::reactiveVal(NULL)
     shiny::observeEvent(input$effect_click, clicked(input$effect_click))
