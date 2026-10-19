@@ -61,3 +61,12 @@ test_that("the calculator's effect plot keeps a 4:3 shape within height limits",
   expect_equal(effect_plot_height(NULL), 320)
   expect_equal(effect_plot_height(NA), 320)
 })
+
+test_that("percent ticks widen their spacing on narrow plots", {
+  grDevices::pdf(NULL)
+  on.exit(grDevices::dev.off())
+  graphics::plot.new()
+  expect_equal(percent_ticks(6), seq(0, 100, by = 20))
+  expect_equal(percent_ticks(1.6), seq(0, 100, by = 50))
+  expect_equal(percent_ticks(0.1), c(0, 50, 100))
+})

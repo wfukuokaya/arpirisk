@@ -194,6 +194,10 @@ fieldset.input-block legend {
    chart under the pointer and the readout would flicker between states.
    The longest text (about 100 characters) needs 2 lines when the card is at
    least 400px wide, 3 lines down to 270px, and 4 below that. */
+/* The effect plot is inline SVG drawn at the output's width; it scales with
+   the card, and the pointer reads values from it (app_js()). */
+.effect-plot { cursor: crosshair; touch-action: manipulation; }
+.effect-plot svg { display: block; width: 100%; height: auto; }
 .readout-frame { container-type: inline-size; margin: 0.25rem 0 0.35rem; }
 #effect_readout { display: block; height: 5.3rem; overflow: hidden; }
 @container (min-width: 270px) { #effect_readout { height: 4rem; } }
@@ -266,10 +270,18 @@ fieldset.input-block legend {
 }
 
 # Sends the page address to the server (Shinylive runs the app in an iframe,
-# so the server cannot see the page's query string) and copies the text of an
-# element to the clipboard, confirming on the button.
+# so the server cannot see the page's query string), reports hover and tap on
+# the effect plot, closes help notes on an outside click, and picks the header
+# gradient at random.
 app_js <- function() {
   "
+document.addEventListener('DOMContentLoaded', function () {
+  var art = document.querySelector('.header-art');
+  var source = document.getElementById('header-gradients');
+  if (!art || !source) { return; }
+  var gradients = JSON.parse(source.textContent);
+  art.innerHTML = gradients[Math.floor(Math.random() * gradients.length)];
+});
 $(document).on('shiny:connected', function () {
   var location = window.location;
   try { location = window.top.location; } catch (error) {}
@@ -279,6 +291,38 @@ $(document).on('shiny:connected', function () {
     { priority: 'event' }
   );
 });
+// Hover and tap on the effect plot report the baseline risk under the pointer,
+// as plotOutput() did: { x } in percent, or null outside the plotting region.
+(function () {
+  function riskAt(plot, event) {
+    var rect = plot.getBoundingClientRect();
+    var user = plot.dataset.xUser.split(' ').map(Number);
+    var ndc = plot.dataset.xNdc.split(' ').map(Number);
+    var position = ((event.clientX - rect.left) / rect.width - ndc[0]) / (ndc[1] - ndc[0]);
+    if (!(position >= 0 && position <= 1)) { return null; }
+    return { x: user[0] + position * (user[1] - user[0]) };
+  }
+  function plotOf(target) {
+    return target && target.closest ? target.closest('.effect-plot') : null;
+  }
+  var lastHover = 0;
+  document.addEventListener('mousemove', function (event) {
+    var plot = plotOf(event.target);
+    if (!plot || Date.now() - lastHover < 80) { return; }
+    lastHover = Date.now();
+    Shiny.setInputValue('effect_hover', riskAt(plot, event));
+  });
+  document.addEventListener('mouseout', function (event) {
+    if (plotOf(event.target) && !plotOf(event.relatedTarget)) {
+      Shiny.setInputValue('effect_hover', null);
+    }
+  });
+  document.addEventListener('click', function (event) {
+    var plot = plotOf(event.target);
+    var point = plot ? riskAt(plot, event) : null;
+    if (point) { Shiny.setInputValue('effect_click', point, { priority: 'event' }); }
+  });
+})();
 // Close open help notes when the user clicks or taps outside them.
 document.addEventListener('click', function (event) {
   document.querySelectorAll('bslib-popover').forEach(function (popover) {

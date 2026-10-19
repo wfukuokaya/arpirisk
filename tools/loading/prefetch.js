@@ -16,6 +16,25 @@ window.mhspcPrefetch = (function () {
   var total = startupFiles.reduce(function (sum, file) { return sum + file[1]; }, 0);
   var received = 0;
 
+  // Errors are shown on the loading screen, which the app covers once it runs,
+  // so a phone user can report why the calculator did not start.
+  var errorBox = document.getElementById("loading-error");
+  function report(message) {
+    errorBox.hidden = false;
+    errorBox.textContent += String(message).slice(0, 500) + "\n";
+  }
+  window.addEventListener("error", function (event) {
+    report(event.message || (event.target && event.target.src) || "Unknown error");
+  }, true);
+  window.addEventListener("unhandledrejection", function (event) {
+    report(event.reason && event.reason.message ? event.reason.message : event.reason);
+  });
+  var consoleError = console.error;
+  console.error = function () {
+    report(Array.prototype.map.call(arguments, String).join(" "));
+    return consoleError.apply(console, arguments);
+  };
+
   function show(percent) {
     fill.style.width = percent + "%";
     progress.setAttribute("aria-valuenow", String(percent));
@@ -71,7 +90,7 @@ window.mhspcPrefetch = (function () {
       show(100);
       loading.classList.add("is-starting");
       progress.removeAttribute("aria-valuenow");
-      text.textContent = "Starting R";
+      text.textContent = "Starting";
     });
   }
 

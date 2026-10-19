@@ -26,6 +26,10 @@ html, body, #root, .shinylive-container, .shinylive-viewer, .app-frame { backgro
 }
 .loading .progress-text { font-size: 0.875rem; color: #495057; font-variant-numeric: tabular-nums; }
 .loading .slow { display: none; }
+.loading .loading-error {
+  max-width: min(30rem, 90vw); max-height: 30vh; overflow: auto; margin: 0;
+  font-size: 0.75rem; color: #B24745; text-align: left; white-space: pre-wrap;
+}
 .loading.is-slow .slow { display: block; }
 @keyframes indeterminate {
   from { transform: translateX(-100%); }

@@ -120,7 +120,7 @@ effect_plot_style <- function() {
 
 effect_plot_par <- function() {
   list(
-    mar = c(3.6, 4.4, 0.6, 0.8),
+    mar = c(3.6, 4.4, 0.6, 1.6),
     mgp = c(2.3, 0.45, 0),
     tcl = -0.2,
     las = 1,
@@ -138,6 +138,21 @@ effect_plot_height <- function(width) {
     return(320)
   }
   round(min(max(0.75 * width, 320), 560))
+}
+
+# Ticks every 20% when their labels fit the plot width, otherwise every 25% or
+# 50%, so that a narrow plot keeps evenly spaced labels instead of graphics
+# dropping the ones that would overlap.
+percent_ticks <- function(width_inches) {
+  for (step in c(20, 25, 50)) {
+    ticks <- seq(0, 100, by = step)
+    label_width <- max(graphics::strwidth(paste0(ticks, "%"), units = "inches"))
+    # Labels are centered on their ticks; neighbors need a 15% gap.
+    if ((length(ticks) - 1L) * label_width * 1.15 <= width_inches) {
+      return(ticks)
+    }
+  }
+  c(0, 50, 100)
 }
 
 hr_ticks <- function(limits) {
@@ -169,10 +184,10 @@ draw_effect_plot <- function(curve,
   # The x axis always spans 0% to 100%; the curve covers the range in which
   # effects were estimated.
   x_limits <- c(0, 100)
-  x_ticks <- seq(0, 100, by = 20)
 
   graphics::plot.new()
   graphics::plot.window(xlim = x_limits, ylim = y_limits, log = if (is_log) "y" else "", xaxs = "i")
+  x_ticks <- percent_ticks(graphics::par("pin")[[1L]])
   graphics::abline(h = y_ticks, col = style$grid, lwd = 1)
   graphics::abline(h = display$reference, col = style$axis, lwd = 1.5)
 

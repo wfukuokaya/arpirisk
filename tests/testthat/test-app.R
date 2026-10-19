@@ -86,6 +86,9 @@ test_that("the server matches the package functions for a complete patient", {
     expect_match(output$hr_detail, "^95% CI, 0\\.[0-9]{2} to 0\\.[0-9]{2}$")
     expect_match(output$icon_array$html, "icon additional", fixed = TRUE)
     expect_match(output$effect_readout$html, "This patient (baseline risk 62%)", fixed = TRUE)
+    expect_match(output$effect_plot$html, "<svg width=", fixed = TRUE)
+    expect_match(output$effect_plot$html, "data-x-user=\"[0-9.-]+ [0-9.]+\"")
+    expect_match(output$effect_plot$html, "This patient", fixed = TRUE)
     expect_null(output$result_notes)
 
     session$setInputs(effect_hover = list(x = 30))
@@ -179,14 +182,26 @@ test_that("number formatting uses a minus sign and bounded percentages", {
   )
 })
 
-test_that("the header art is one of the bundled gradients", {
+test_that("the header art shows the first gradient and offers all of them to the browser", {
   expect_gte(length(header_gradients), 2L)
   expect_true(all(startsWith(header_gradients, "<svg ")))
   expect_true(all(grepl("preserveAspectRatio=\"xMidYMid slice\"", header_gradients, fixed = TRUE)))
   expect_false(any(grepl("<metadata>", header_gradients, fixed = TRUE)))
   html <- as.character(header_art(header_gradients))
   expect_match(html, "<div class=\"header-art\" aria-hidden=\"true\"><svg ", fixed = TRUE)
-  expect_match(as.character(header_art("<svg one>")), "<svg one>", fixed = TRUE)
+  html <- as.character(header_art(c("<svg one>", "<svg two>")))
+  expect_match(html, "aria-hidden=\"true\"><svg one></div>", fixed = TRUE)
+  expect_match(html, "id=\"header-gradients\">[\"<svg one>\",\"<svg two>\"]</script>", fixed = TRUE)
+  expect_match(app_js(), "getElementById('header-gradients')", fixed = TRUE)
+})
+
+test_that("the page is rendered once and served for every request", {
+  app <- mhspc_app(mhspc_model())
+  request <- list(REQUEST_METHOD = "GET", PATH_INFO = "/", QUERY_STRING = "")
+  first <- app$httpHandler(request)
+  expect_equal(first$status, 200L)
+  expect_match(first$content, "ARPI treatment effect calculator", fixed = TRUE)
+  expect_identical(app$httpHandler(request)$content, first$content)
 })
 
 test_that("help notes close when the user clicks outside them", {

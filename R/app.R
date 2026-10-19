@@ -23,10 +23,18 @@ run_app <- function(model = mhspc_model(), ...) {
 #' @rdname run_app
 #' @export
 mhspc_app <- function(model = mhspc_model()) {
-  rlang::check_installed(c("shiny", "bslib"), reason = "to run the calculator.")
+  rlang::check_installed(c("shiny", "bslib", "htmltools", "svglite"), reason = "to run the calculator.")
   check_model(model)
-  # The UI is built per page load so that each visitor gets a random header.
-  shiny::shinyApp(ui = function(request) app_ui(model), server = app_server(model))
+  server <- app_server(model)
+  # The page is rendered once, here, and the same response is served for every
+  # request. Rendering it inside Shiny's request handler nests deeply enough to
+  # exceed the smaller WebAssembly stack of WebKit browsers (Safari and every
+  # browser on an iPhone), where the Shinylive app then never starts. The
+  # header gradient is picked in the browser instead (app_js()).
+  page <- shiny::shinyApp(ui = app_ui(model), server = server)$httpHandler(
+    list(REQUEST_METHOD = "GET", PATH_INFO = "/", QUERY_STRING = "")
+  )
+  shiny::shinyApp(ui = function(request) page, server = server)
 }
 
 # --- UI ----------------------------------------------------------------------
@@ -34,61 +42,143 @@ mhspc_app <- function(model = mhspc_model()) {
 app_ui <- function(model) {
   predictors <- model$predictors
   groups <- purrr::map_chr(predictors, "group")
-  bslib::page_sidebar(
-    title = shiny::tagList(
-      header_art(),
+  # In Shinylive, building and rendering this page nested deeply enough to
+  # exceed the smaller WebAssembly stack of WebKit browsers (Safari and every
+  # browser on an iPhone), where the app then never started. Two measures keep
+  # the nesting shallow: every part is built before page_sidebar() is called
+  # (arguments are evaluated lazily, so a part passed as a call is built deep
+  # inside bslib's own calls), and the deepest parts are rendered to HTML on
+  # their own (flatten_tags()).
+  title <- shiny::tagList(
+    header_art(),
+    shiny::tags$div(
+      class = "app-title",
       shiny::tags$div(
-        class = "app-title",
-        shiny::tags$div(
-          class = "app-title-text",
-          shiny::tags$span(class = "app-title-main", "ARPI treatment effect calculator"),
-          shiny::tags$span(class = "app-title-sub", "Metastatic hormone-sensitive prostate cancer")
-        ),
-        shiny::tags$span(
-          class = "app-title-meta",
-          "4-year risk of death with ADT, with or without an ARPI, from 4 randomized clinical trials"
-        )
+        class = "app-title-text",
+        shiny::tags$span(class = "app-title-main", "ARPI treatment effect calculator"),
+        shiny::tags$span(class = "app-title-sub", "Metastatic hormone-sensitive prostate cancer")
+      ),
+      shiny::tags$span(
+        class = "app-title-meta",
+        "4-year risk of death with ADT, with or without an ARPI, from 4 randomized clinical trials"
       )
-    ),
+    )
+  )
+  sidebar_heading <- shiny::tags$div(
+    class = "sidebar-heading",
+    shiny::tags$h2("Patient characteristics"),
+    shiny::tags$div(
+      class = "sidebar-actions",
+      shiny::actionLink("use_example", "Fill example patient"),
+      shiny::actionLink("clear_inputs", "Clear all")
+    )
+  )
+  clinical_inputs <- flatten_tags(input_group_ui("Clinical", predictors[groups == "clinical"]))
+  laboratory_inputs <- flatten_tags(input_group_ui("Laboratory", predictors[groups == "laboratory"]))
+  sidebar <- bslib::sidebar(
+    width = 340,
+    open = list(desktop = "always", mobile = "always"),
+    sidebar_heading,
+    clinical_inputs,
+    laboratory_inputs
+  )
+  head <- shiny::tags$head(
+    shiny::tags$style(shiny::HTML(app_theme_css())),
+    shiny::tags$style(shiny::HTML(app_css())),
+    shiny::tags$script(shiny::HTML(app_js()))
+  )
+  results <- flatten_tags(results_ui(model))
+  about <- flatten_tags(about_ui(model))
+  footer <- shiny::tags$footer(
+    class = "app-footer",
+    shiny::tags$span(paste0("Model ", model$meta$model_version)),
+    shiny::tags$span("For research and education; not for use as a medical device."),
+    shiny::tags$span("Entered values are not stored. The web version runs entirely in your browser.")
+  )
+  theme <- bslib::bs_theme(version = 5, preset = "shiny")
+  bslib::page_sidebar(
+    title = title,
     window_title = "ARPI treatment effect calculator for mHSPC",
-    theme = bslib::bs_theme(version = 5, preset = "shiny"),
+    theme = theme,
     fillable = FALSE,
     lang = "en",
-    sidebar = bslib::sidebar(
-      width = 340,
-      open = list(desktop = "always", mobile = "always"),
-      shiny::tags$div(
-        class = "sidebar-heading",
-        shiny::tags$h2("Patient characteristics"),
-        shiny::tags$div(
-          class = "sidebar-actions",
-          shiny::actionLink("use_example", "Fill example patient"),
-          shiny::actionLink("clear_inputs", "Clear all")
-        )
-      ),
-      input_group_ui("Clinical", predictors[groups == "clinical"]),
-      input_group_ui("Laboratory", predictors[groups == "laboratory"])
-    ),
-    shiny::tags$head(
-      shiny::tags$style(shiny::HTML(app_theme_css())),
-      shiny::tags$style(shiny::HTML(app_css())),
-      shiny::tags$script(shiny::HTML(app_js()))
-    ),
-    results_ui(model),
-    about_ui(model),
-    shiny::tags$footer(
-      class = "app-footer",
-      shiny::tags$span(paste0("Model ", model$meta$model_version)),
-      shiny::tags$span("For research and education; not for use as a medical device."),
-      shiny::tags$span("Entered values are not stored. The web version runs entirely in your browser.")
-    )
+    sidebar = sidebar,
+    head,
+    results,
+    about,
+    footer
   )
 }
 
-# One of the layered radial gradients in R/app_gradients.R, chosen at random,
-# drawn behind the title.
+svg_font_family <- paste0(
+  "font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;"
+)
+
+# The effect plot as inline SVG for the calculator. svglite writes the drawing
+# as text and the browser renders it; rasterizing a PNG with renderPlot() inside
+# WebAssembly exceeded the stack of WebKit browsers (Safari and every browser
+# on an iPhone). app_js() reports hover and tap as input$effect_hover and
+# input$effect_click, in baseline risk percent, using the x range stored on the
+# element. Sizes match the earlier 96 dpi PNG.
+effect_plot_ui <- function(result, scale, model, width = NULL) {
+  if (length(width) != 1L || !is.finite(width) || width <= 0) {
+    width <- 560
+  }
+  height <- effect_plot_height(width)
+  curve <- effect_curve(model, scale)
+  risk_range <- range(curve$risk_percent)
+  patient <- data.frame(
+    risk_percent = min(max(100 * result$risk, risk_range[[1L]]), risk_range[[2L]]),
+    estimate = result$effects[[scale]]$estimate * effect_scales()[[scale]]$multiplier
+  )
+  svg <- svglite::svgstring(width = width / 96, height = height / 96, standalone = FALSE)
+  device <- grDevices::dev.cur()
+  on.exit(if (device %in% grDevices::dev.list()) grDevices::dev.off(device), add = TRUE)
+  graphics::par(effect_plot_par())
+  draw_effect_plot(curve, scale, patients = patient, overall = overall_effect(model, scale))
+  x_user <- graphics::par("usr")[1:2]
+  x_ndc <- graphics::grconvertX(x_user, "user", "ndc")
+  grDevices::dev.off(device)
+  shiny::tags$div(
+    class = "effect-plot",
+    role = "img",
+    `aria-label` = paste(
+      "Treatment effect across baseline risk:", effect_scales()[[scale]]$y_label,
+      "by 4-year risk of death with ADT alone"
+    ),
+    `data-x-user` = paste(signif(x_user, 8), collapse = " "),
+    `data-x-ndc` = paste(signif(x_ndc, 8), collapse = " "),
+    # svglite names the font R measured the text with (Noto Sans in webR, which
+    # phones lack); the page's own fonts are used instead.
+    shiny::HTML(gsub("font-family: \"[^\"]*\";", svg_font_family, svg()))
+  )
+}
+
+# Renders part of the page to HTML, keeping its dependencies, so that rendering
+# the whole page does not recurse through that part's nesting (see app_ui()).
+flatten_tags <- function(x) {
+  rendered <- htmltools::renderTags(x)
+  htmltools::attachDependencies(
+    shiny::tagList(
+      if (nzchar(rendered$head)) shiny::tags$head(shiny::HTML(rendered$head)),
+      shiny::HTML(rendered$html)
+    ),
+    rendered$dependencies
+  )
+}
+
+# The layered radial gradients in R/app_gradients.R, drawn behind the title. The
+# first is in the page; app_js() swaps in one chosen at random. The gradients
+# reuse element ids, so only one can be in the page at a time.
 header_art <- function(gradients = header_gradients) {
-  shiny::tags$div(class = "header-art", `aria-hidden` = "true", shiny::HTML(sample(gradients, 1L)))
+  shiny::tagList(
+    shiny::tags$div(class = "header-art", `aria-hidden` = "true", shiny::HTML(gradients[[1L]])),
+    shiny::tags$script(
+      type = "application/json",
+      id = "header-gradients",
+      shiny::HTML(jsonlite::toJSON(unname(gradients)))
+    )
+  )
 }
 
 input_group_ui <- function(title, predictors) {
@@ -267,12 +357,9 @@ results_ui <- function(model) {
             )
           ),
           bslib::card_body(
-            shiny::plotOutput(
-              "effect_plot",
-              height = "auto",
-              hover = shiny::hoverOpts("effect_hover", delay = 80, delayType = "throttle"),
-              click = "effect_click"
-            ),
+            # shiny-report-size makes Shiny send the output's width to the
+            # server, as it does for plotOutput().
+            shiny::uiOutput("effect_plot", class = "effect-plot-output shiny-report-size"),
             shiny::tags$div(class = "readout-frame", shiny::uiOutput("effect_readout")),
             shiny::tags$p(
               class = "chart-caption",
@@ -451,7 +538,7 @@ app_server <- function(model) {
       }, ignoreInit = TRUE)
     })
 
-    entered <- shiny::reactive({
+    entered <- function() {
       purrr::map(predictors, function(predictor) {
         if (predictor$type %in% c("rcs", "linear")) {
           return(base_values[[predictor$name]])
@@ -462,27 +549,36 @@ app_server <- function(model) {
         }
         if (predictor$type == "categorical") value else as.numeric(value)
       })
-    })
-    assessment <- shiny::reactive({
-      assess_inputs(as.data.frame(entered()), model)
-    })
-    estimates <- shiny::reactive({
-      checked <- assessment()
+    }
+    # One reactive holds both the checked inputs and the estimates. Each level
+    # of nested reactives adds stack depth, and a chain of them exceeded the
+    # smaller WebAssembly stack of WebKit browsers (Safari and every browser on
+    # an iPhone), where the Shinylive app then stopped responding.
+    state <- shiny::reactive({
+      checked <- assess_inputs(as.data.frame(entered()), model)
       if (any(checked$issues$severity == "error")) {
-        return(NULL)
+        return(list(assessment = checked, estimates = NULL))
       }
       lp <- linear_predictor(checked$values, model)
       list(
-        lp = lp,
-        risk = absolute_risk(lp, model),
-        in_range = in_effect_range(lp, model),
-        effects = purrr::map(
-          rlang::set_names(c("ard", "rmst", "hr")),
-          function(scale) effect_at_lp(lp, model, scale)
-        ),
-        issues = checked$issues
+        assessment = checked,
+        estimates = list(
+          lp = lp,
+          risk = absolute_risk(lp, model),
+          in_range = in_effect_range(lp, model),
+          effects = purrr::map(
+            rlang::set_names(c("ard", "rmst", "hr")),
+            function(scale) effect_at_lp(lp, model, scale)
+          ),
+          issues = checked$issues
+        )
       )
     })
+    assessment <- function() state()$assessment
+    estimates <- function() state()$estimates
+    # Computing the state here, before any output, keeps that work out of the
+    # deeper stacks of the outputs, which read the cached value.
+    shiny::observe(state(), priority = 100)
     output$has_estimates <- shiny::reactive(!is.null(estimates()))
     shiny::outputOptions(output, "has_estimates", suspendWhenHidden = FALSE)
 
@@ -518,9 +614,14 @@ app_server <- function(model) {
       )
     })
 
+    # Outputs return early instead of calling shiny::req(): a condition signaled
+    # inside an output makes Shiny capture the call stack, which alone exceeded
+    # the WebAssembly stack of WebKit browsers.
     result_messages <- shiny::reactive({
       result <- estimates()
-      shiny::req(result)
+      if (is.null(result)) {
+        return(character())
+      }
       issues <- result$issues[result$issues$severity %in% c("warning", "note"), , drop = FALSE]
       messages <- purrr::pmap_chr(
         list(issues$code, issues$input, issues$value),
@@ -551,69 +652,83 @@ app_server <- function(model) {
     })
 
     output$risk_value <- shiny::renderText({
-      shiny::req(estimates())
+      if (is.null(estimates())) {
+        return(NULL)
+      }
       format_percent(estimates()$risk)
     })
     output$arpi_risk_value <- shiny::renderText({
       result <- estimates()
-      shiny::req(result)
+      if (is.null(result)) {
+        return(NULL)
+      }
       format_percent(result$risk - result$effects$ard$estimate)
     })
     output$ard_value <- shiny::renderUI({
-      shiny::req(estimates())
+      if (is.null(estimates())) {
+        return(NULL)
+      }
       value_with_unit(format_number(100 * estimates()$effects$ard$estimate), "per 100")
     })
     output$ard_detail <- shiny::renderText({
-      shiny::req(estimates())
+      if (is.null(estimates())) {
+        return(NULL)
+      }
       effect <- estimates()$effects$ard
       format_interval(100 * effect$conf_low, 100 * effect$conf_high)
     })
     output$rmst_value <- shiny::renderUI({
-      shiny::req(estimates())
+      if (is.null(estimates())) {
+        return(NULL)
+      }
       value_with_unit(format_number(estimates()$effects$rmst$estimate, 1), "months")
     })
     output$rmst_detail <- shiny::renderText({
-      shiny::req(estimates())
+      if (is.null(estimates())) {
+        return(NULL)
+      }
       effect <- estimates()$effects$rmst
       format_interval(effect$conf_low, effect$conf_high, digits = 1)
     })
     output$hr_value <- shiny::renderText({
-      shiny::req(estimates())
+      if (is.null(estimates())) {
+        return(NULL)
+      }
       format_number(estimates()$effects$hr$estimate, 2)
     })
     output$hr_detail <- shiny::renderText({
-      shiny::req(estimates())
+      if (is.null(estimates())) {
+        return(NULL)
+      }
       effect <- estimates()$effects$hr
       format_interval(effect$conf_low, effect$conf_high, digits = 2)
     })
 
     output$icon_array <- shiny::renderUI({
       result <- estimates()
-      shiny::req(result)
+      if (is.null(result)) {
+        return(NULL)
+      }
       icon_array_ui(result$risk, result$effects$ard)
     })
 
     effect_scale <- shiny::reactive(input$effect_scale %||% "ard")
-    output$effect_plot <- shiny::renderPlot({
+    output$effect_plot <- shiny::renderUI({
       result <- estimates()
-      shiny::req(result)
-      scale <- effect_scale()
-      curve <- effect_curve(model, scale)
-      risk_range <- range(curve$risk_percent)
-      patient <- data.frame(
-        risk_percent = min(max(100 * result$risk, risk_range[[1L]]), risk_range[[2L]]),
-        estimate = result$effects[[scale]]$estimate * effect_scales()[[scale]]$multiplier
-      )
-      graphics::par(effect_plot_par())
-      draw_effect_plot(curve, scale, patients = patient, overall = overall_effect(model, scale))
-    }, height = function() effect_plot_height(session$clientData$output_effect_plot_width), res = 96)
+      if (is.null(result)) {
+        return(NULL)
+      }
+      effect_plot_ui(result, effect_scale(), model, session$clientData$output_effect_plot_width)
+    })
 
     clicked <- shiny::reactiveVal(NULL)
     shiny::observeEvent(input$effect_click, clicked(input$effect_click))
     shiny::observeEvent(effect_scale(), clicked(NULL))
     output$effect_readout <- shiny::renderUI({
       result <- estimates()
-      shiny::req(result)
+      if (is.null(result)) {
+        return(NULL)
+      }
       scale <- effect_scale()
       pointer <- input$effect_hover %||% clicked()
       curve <- effect_curve(model, scale)

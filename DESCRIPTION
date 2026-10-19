@@ -37,10 +37,12 @@ Suggests:
     bslib (>= 0.9.0),
     covr,
     Hmisc,
+    htmltools,
     knitr,
     rmarkdown,
     shiny (>= 1.10.0),
     shinylive,
+    svglite,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
