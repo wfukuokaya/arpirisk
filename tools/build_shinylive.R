@@ -39,54 +39,62 @@ shinylive::export(
 )
 
 # Until R has started in the browser, which can take a minute or more on a
-# phone's first visit, Shinylive shows only faint gray dots on a white page. That
-# indicator is hidden and replaced by a loading message behind the transparent
-# app frame, which the app's own page covers once it renders. After 90 seconds
-# it adds advice in case the browser cannot run R.
-loading_head <- c(
-  "<style>",
-  "  html, body, #root, .shinylive-container, .shinylive-viewer, .app-frame { background: transparent !important; }",
-  "  #root { position: relative; z-index: 1; }",
-  "  .shinylive-viewer .loading-wrapper { display: none !important; }",
-  "  .loading { position: fixed; inset: 0; z-index: 0; display: flex; flex-direction: column;",
-  "    align-items: center; justify-content: center; gap: 0.75rem; padding: 1.5rem; text-align: center;",
-  "    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;",
-  "    color: #212529; background: #ffffff; }",
-  "  .loading h1 { font-size: 1.25rem; font-weight: 600; margin: 0; }",
-  "  .loading p { font-size: 0.95rem; color: #495057; max-width: 30rem; margin: 0; line-height: 1.5; }",
-  "  .loading .spinner { width: 2rem; height: 2rem; border-radius: 50%; border: 3px solid #e9ecef;",
-  "    border-top-color: #374E55; animation: spin 0.9s linear infinite; }",
-  "  .loading .slow { display: none; }",
-  "  .loading.is-slow .slow { display: block; }",
-  "  @keyframes spin { to { transform: rotate(360deg); } }",
-  "  @media (prefers-reduced-motion: reduce) { .loading .spinner { animation: none; } }",
-  "</style>"
+# phone's first visit, Shinylive shows only faint gray dots on a white page.
+# tools/loading/ replaces them with a loading screen behind the transparent app
+# frame, which the app's own page covers once it renders. The screen downloads
+# the files R needs at startup with a progress bar, then starts Shinylive, which
+# reads them from the browser cache. The list was taken from the requests of a
+# first visit with Shinylive 0.8; a file missing from it only makes the bar less
+# accurate.
+startup_files <- file.path("shinylive", "webr", c(
+  "R.js", "R.wasm", "libRblas.so", "libRlapack.so", "library.js.metadata", "library.data.gz",
+  "packages/metadata.rds",
+  "vfs/usr/lib/R/library/parallel.js.metadata", "vfs/usr/lib/R/library/parallel.data.gz",
+  "vfs/usr/lib/R/library/tcltk.js.metadata", "vfs/usr/lib/R/library/tcltk.data.gz",
+  "vfs/usr/lib/R/library/translations.js.metadata", "vfs/usr/lib/R/library/translations.data.gz",
+  "vfs/usr/lib/R/library/grDevices/libs.js.metadata", "vfs/usr/lib/R/library/grDevices/libs.data.gz"
+))
+startup_files <- c(
+  startup_files,
+  # Packages are versioned, so they are found by name.
+  purrr::map_chr(c("purrr", "vctrs"), function(package) {
+    found <- list.files(file.path(output_dir, "shinylive", "webr", "packages", package), pattern = "[.]tgz$")
+    if (length(found) != 1L) {
+      cli::cli_abort("Expected one WebAssembly build of {.pkg {package}} in the exported site.")
+    }
+    file.path("shinylive", "webr", "packages", package, found)
+  })
 )
-loading_body <- c(
-  "<div class=\"loading\" id=\"loading\" role=\"status\">",
-  "  <div class=\"spinner\" aria-hidden=\"true\"></div>",
-  "  <h1>ARPI treatment effect calculator</h1>",
-  paste(
-    "  <p>Loading. The calculator runs entirely in your browser, so the first visit downloads the R",
-    "software it needs; this can take a minute or more on a mobile connection. Later visits are faster.</p>"
-  ),
-  paste(
-    "  <p class=\"slow\">Still loading. If nothing appears, check the connection and reload the page,",
-    "or open the calculator on a computer.</p>"
-  ),
-  "</div>",
-  "<script>setTimeout(function () { document.getElementById('loading').classList.add('is-slow'); }, 90000);</script>"
+missing_files <- startup_files[!file.exists(file.path(output_dir, startup_files))]
+if (length(missing_files) > 0L) {
+  cli::cli_abort(c("Startup files are missing from the exported site.", x = "{.file {missing_files}}"))
+}
+startup_json <- jsonlite::toJSON(
+  unname(purrr::map2(startup_files, file.size(file.path(output_dir, startup_files)), list)),
+  auto_unbox = TRUE
 )
+
+loading_dir <- file.path("tools", "loading")
+read_text <- function(name) readLines(file.path(loading_dir, name), warn = FALSE)
+prefetch_js <- sub("__STARTUP_FILES__", startup_json, read_text("prefetch.js"), fixed = TRUE)
+
 index_path <- file.path(output_dir, "index.html")
 index_html <- readLines(index_path, warn = FALSE)
 head_end <- grep("</head>", index_html, fixed = TRUE)
 root_line <- grep("id=\"root\"", index_html, fixed = TRUE)
-if (length(head_end) != 1L || length(root_line) != 1L) {
-  cli::cli_abort("Could not find {.code </head>} and the root element in {.file {index_path}}.")
+import_line <- grep("import { runExportedApp } from \"./shinylive/shinylive.js\";", index_html, fixed = TRUE)
+if (length(head_end) != 1L || length(root_line) != 1L || length(import_line) != 1L) {
+  cli::cli_abort("The exported {.file {index_path}} does not have the expected Shinylive structure.")
 }
+# Shinylive starts only after the downloads; module scripts run after the page
+# is parsed, so the prefetch script in the body has started by then.
+index_html[[import_line]] <- paste(
+  "      await window.mhspcPrefetch;",
+  "const { runExportedApp } = await import(\"./shinylive/shinylive.js\");"
+)
 index_html <- c(
-  index_html[seq_len(head_end - 1L)], loading_head,
-  index_html[head_end:(root_line - 1L)], loading_body,
+  index_html[seq_len(head_end - 1L)], "<style>", read_text("loading.css"), "</style>",
+  index_html[head_end:(root_line - 1L)], read_text("loading.html"), "<script>", prefetch_js, "</script>",
   index_html[root_line:length(index_html)]
 )
 writeLines(index_html, index_path)

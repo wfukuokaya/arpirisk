@@ -1,7 +1,10 @@
 # mhspcarpi (development version)
 
-* Web calculator: a loading message replaces Shinylive's faint loading
-  indicator, which looked like a blank page on phones during the first visit.
+* Web calculator: a loading screen with a progress bar replaces Shinylive's
+  faint loading indicator, which looked like a blank page on phones during the
+  first visit. The page downloads the files R needs at startup while measuring
+  progress, then starts Shinylive, which reads them from the browser cache
+  (`tools/loading/`).
 * Calculator: the treatment-effect plot keeps a 4:3 shape as the window
   resizes, between 320 and 560 pixels tall, instead of a fixed 300 pixels.
 * Calculator: the hazard ratio for death, with its 95% CI, is shown beside the

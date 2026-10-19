@@ -1,0 +1,37 @@
+/* Loading screen shown behind the transparent Shinylive frame until the app's
+   own page covers it. Shinylive's faint loading indicator is hidden. */
+html, body, #root, .shinylive-container, .shinylive-viewer, .app-frame { background: transparent !important; }
+#root { position: relative; z-index: 1; }
+.shinylive-viewer .loading-wrapper { display: none !important; }
+.loading {
+  position: fixed; inset: 0; z-index: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 0.75rem; padding: 1.5rem; text-align: center;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: #212529; background: #ffffff;
+}
+.loading h1 { font-size: 1.25rem; font-weight: 600; margin: 0; }
+.loading p { font-size: 0.95rem; color: #495057; max-width: 30rem; margin: 0; line-height: 1.5; }
+.loading .progress {
+  width: min(20rem, 80vw); height: 0.5rem; border-radius: 999px;
+  background: #e9ecef; overflow: hidden;
+}
+.loading .progress-fill {
+  width: 0; height: 100%; border-radius: inherit; background: #374E55;
+  transition: width 0.2s linear;
+}
+/* While R starts after the download, the bar has no measurable progress. */
+.loading.is-starting .progress-fill {
+  width: 30%; animation: indeterminate 1.4s ease-in-out infinite;
+}
+.loading .progress-text { font-size: 0.875rem; color: #495057; font-variant-numeric: tabular-nums; }
+.loading .slow { display: none; }
+.loading.is-slow .slow { display: block; }
+@keyframes indeterminate {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(340%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .loading .progress-fill { transition: none; }
+  .loading.is-starting .progress-fill { width: 100%; animation: none; opacity: 0.4; }
+}
