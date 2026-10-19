@@ -2,7 +2,7 @@
 # R/app_theme.R, which tools/build_theme.R generates from _brand.yml.
 app_css <- function() {
   "
-body { font-family: var(--font-body); color: var(--ink); background: var(--paper); }
+html, body { font-family: var(--font-body); color: var(--ink); background: var(--paper); }
 h1, h2, h3, h4 {
   font-family: var(--font-display); font-weight: var(--headings-weight);
   line-height: var(--headings-line-height); color: var(--ink);

@@ -38,6 +38,59 @@ shinylive::export(
   template_params = list(title = "ARPI treatment effect calculator for mHSPC")
 )
 
+# Until R has started in the browser, which can take a minute or more on a
+# phone's first visit, Shinylive shows only faint gray dots on a white page. That
+# indicator is hidden and replaced by a loading message behind the transparent
+# app frame, which the app's own page covers once it renders. After 90 seconds
+# it adds advice in case the browser cannot run R.
+loading_head <- c(
+  "<style>",
+  "  html, body, #root, .shinylive-container, .shinylive-viewer, .app-frame { background: transparent !important; }",
+  "  #root { position: relative; z-index: 1; }",
+  "  .shinylive-viewer .loading-wrapper { display: none !important; }",
+  "  .loading { position: fixed; inset: 0; z-index: 0; display: flex; flex-direction: column;",
+  "    align-items: center; justify-content: center; gap: 0.75rem; padding: 1.5rem; text-align: center;",
+  "    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;",
+  "    color: #212529; background: #ffffff; }",
+  "  .loading h1 { font-size: 1.25rem; font-weight: 600; margin: 0; }",
+  "  .loading p { font-size: 0.95rem; color: #495057; max-width: 30rem; margin: 0; line-height: 1.5; }",
+  "  .loading .spinner { width: 2rem; height: 2rem; border-radius: 50%; border: 3px solid #e9ecef;",
+  "    border-top-color: #374E55; animation: spin 0.9s linear infinite; }",
+  "  .loading .slow { display: none; }",
+  "  .loading.is-slow .slow { display: block; }",
+  "  @keyframes spin { to { transform: rotate(360deg); } }",
+  "  @media (prefers-reduced-motion: reduce) { .loading .spinner { animation: none; } }",
+  "</style>"
+)
+loading_body <- c(
+  "<div class=\"loading\" id=\"loading\" role=\"status\">",
+  "  <div class=\"spinner\" aria-hidden=\"true\"></div>",
+  "  <h1>ARPI treatment effect calculator</h1>",
+  paste(
+    "  <p>Loading. The calculator runs entirely in your browser, so the first visit downloads the R",
+    "software it needs; this can take a minute or more on a mobile connection. Later visits are faster.</p>"
+  ),
+  paste(
+    "  <p class=\"slow\">Still loading. If nothing appears, check the connection and reload the page,",
+    "or open the calculator on a computer.</p>"
+  ),
+  "</div>",
+  "<script>setTimeout(function () { document.getElementById('loading').classList.add('is-slow'); }, 90000);</script>"
+)
+index_path <- file.path(output_dir, "index.html")
+index_html <- readLines(index_path, warn = FALSE)
+head_end <- grep("</head>", index_html, fixed = TRUE)
+root_line <- grep("id=\"root\"", index_html, fixed = TRUE)
+if (length(head_end) != 1L || length(root_line) != 1L) {
+  cli::cli_abort("Could not find {.code </head>} and the root element in {.file {index_path}}.")
+}
+index_html <- c(
+  index_html[seq_len(head_end - 1L)], loading_head,
+  index_html[head_end:(root_line - 1L)], loading_body,
+  index_html[root_line:length(index_html)]
+)
+writeLines(index_html, index_path)
+
 # Long-lived caching for the runtime and packages; the page and app bundle are
 # always revalidated so a new release is picked up immediately.
 writeLines(
