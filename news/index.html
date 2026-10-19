@@ -35,7 +35,10 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="mhspcarpi-development-version">mhspcarpi (development version)<a class="anchor" aria-label="anchor" href="#mhspcarpi-development-version"></a></h2>
-<ul><li>Web calculator: a loading screen with a progress bar replaces Shinylive’s faint loading indicator, which looked like a blank page on phones during the first visit. The page downloads the files R needs at startup while measuring progress, then starts Shinylive, which reads them from the browser cache (<code>tools/loading/</code>).</li>
+<ul><li>Web calculator: now runs in Safari and in every browser on an iPhone or iPad (all of which use WebKit). R in WebAssembly ran out of stack there while building the page, computing the results, and drawing the plot. The page is rendered once with its deepest parts pre-rendered, the inputs and estimates are computed in one reactive, outputs return early instead of calling <code><a href="https://rdrr.io/pkg/shiny/man/req.html" class="external-link">shiny::req()</a></code>, and the effect plot is drawn as inline SVG with svglite, with hover and tap handled in the browser. The header gradient is picked in the browser. Checked with Playwright WebKit in iPhone emulation.</li>
+<li>The loading screen text is shorter, and startup errors are shown on it.</li>
+<li>Plots space the x-axis labels every 25% or 50% when the plot is too narrow for every 20%.</li>
+<li>Web calculator: a loading screen with a progress bar replaces Shinylive’s faint loading indicator, which looked like a blank page on phones during the first visit. The page downloads the files R needs at startup while measuring progress, then starts Shinylive, which reads them from the browser cache (<code>tools/loading/</code>).</li>
 <li>Calculator: the treatment-effect plot keeps a 4:3 shape as the window resizes, between 320 and 560 pixels tall, instead of a fixed 300 pixels.</li>
 <li>Calculator: the hazard ratio for death, with its 95% CI, is shown beside the absolute treatment effects; the 2 risks and the 3 treatment effects now take one row each.</li>
 <li>Plot labels have a thin white outline instead of a white box, and the “This patient” label is placed above or below the curve, whichever keeps it closer to the marker without crossing the curve.</li>

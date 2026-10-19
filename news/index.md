@@ -2,6 +2,20 @@
 
 ## mhspcarpi (development version)
 
+- Web calculator: now runs in Safari and in every browser on an iPhone
+  or iPad (all of which use WebKit). R in WebAssembly ran out of stack
+  there while building the page, computing the results, and drawing the
+  plot. The page is rendered once with its deepest parts pre-rendered,
+  the inputs and estimates are computed in one reactive, outputs return
+  early instead of calling
+  [`shiny::req()`](https://rdrr.io/pkg/shiny/man/req.html), and the
+  effect plot is drawn as inline SVG with svglite, with hover and tap
+  handled in the browser. The header gradient is picked in the browser.
+  Checked with Playwright WebKit in iPhone emulation.
+- The loading screen text is shorter, and startup errors are shown on
+  it.
+- Plots space the x-axis labels every 25% or 50% when the plot is too
+  narrow for every 20%.
 - Web calculator: a loading screen with a progress bar replaces
   Shinylive’s faint loading indicator, which looked like a blank page on
   phones during the first visit. The page downloads the files R needs at
