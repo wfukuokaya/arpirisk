@@ -21,9 +21,3 @@
   : Load the risk model and treatment-effect estimates
 - [`example_patients`](https://wfukuokaya.github.io/mhspcarpi/reference/example_patients.md)
   : Example patients
-
-## Calculator
-
-- [`run_app()`](https://wfukuokaya.github.io/mhspcarpi/reference/run_app.md)
-  [`mhspc_app()`](https://wfukuokaya.github.io/mhspcarpi/reference/run_app.md)
-  : Run the calculator

@@ -1,0 +1,32 @@
+# Building blocks for the web calculator
+
+Lower-level functions used by the web calculator, which is developed in
+a separate repository (<https://github.com/wfukuokaya/mhspcarpi-app>)
+and calls them step by step. They may change between minor versions;
+analyses should use
+[`predict_baseline_risk()`](https://wfukuokaya.github.io/mhspcarpi/reference/predict_baseline_risk.md),
+[`estimate_treatment_effect()`](https://wfukuokaya.github.io/mhspcarpi/reference/estimate_treatment_effect.md),
+[`check_inputs()`](https://wfukuokaya.github.io/mhspcarpi/reference/check_inputs.md),
+[`plot_treatment_effect()`](https://wfukuokaya.github.io/mhspcarpi/reference/plot_treatment_effect.md),
+and
+[`treatment_effect_curve()`](https://wfukuokaya.github.io/mhspcarpi/reference/treatment_effect_curve.md).
+
+## Functions
+
+- `check_model(model)` validates a model specification.
+
+- `assess_inputs(newdata, model)` converts inputs to the model's scale
+  and lists issues with them; `assess_categorical(x, predictor)` does
+  this for one categorical predictor.
+
+- `issue_message(code, predictor, value, unit, app)` and
+  `unit_multiplier(predictor, unit)` describe issues and convert units.
+
+- `linear_predictor(values, model)`, `absolute_risk(lp, model)`,
+  `in_effect_range(lp, model)`, `effect_at_lp(lp, model, scale)`, and
+  `effect_risk_range(model)` compute the baseline risk and the treatment
+  effects from values on the model's scale.
+
+- `effect_scales()`, `effect_curve(model, scale)`,
+  `overall_effect(model, scale)`, `effect_plot_par()`, and
+  `draw_effect_plot(curve, scale, ...)` draw the treatment-effect plot.
