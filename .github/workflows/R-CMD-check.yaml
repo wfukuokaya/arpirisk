@@ -16,7 +16,10 @@ jobs:
       matrix:
         config:
           - {os: ubuntu-latest, r: 'release'}
-          - {os: windows-latest, r: 'release'}
+          # On Windows, the R process that Quarto starts does not see the
+          # library where R CMD build installs the package, so the Quarto
+          # vignette is built and checked on Linux and macOS only.
+          - {os: windows-latest, r: 'release', build_args: '"--no-build-vignettes"', check_args: '"--ignore-vignettes"'}
           - {os: macos-latest, r: 'release'}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -36,4 +39,5 @@ jobs:
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
-          build_args: 'c("--no-manual", "--compact-vignettes=gs+qpdf")'
+          args: 'c("--no-manual", "--as-cran", ${{ matrix.config.check_args || '"--as-cran"' }})'
+          build_args: 'c("--no-manual", "--compact-vignettes=gs+qpdf", ${{ matrix.config.build_args || '"--no-manual"' }})'
