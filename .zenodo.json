@@ -1,5 +1,5 @@
 {
-  "title": "mhspcarpi: ARPI Treatment Effects by Baseline Risk in Metastatic Prostate Cancer",
+  "title": "arpirisk: ARPI Treatment Effects by Baseline Risk in Metastatic Prostate Cancer",
   "description": "R package implementing a risk model, developed from individual participant data of 4 placebo-controlled randomized clinical trials (LATITUDE, ARCHES, TITAN, and ARASENS), that predicts the 4-year risk of all-cause death with placebo plus androgen deprivation therapy in patients with metastatic hormone-sensitive prostate cancer, and reports pooled treatment effects of androgen receptor pathway inhibitors on overall survival across this baseline risk.",
   "upload_type": "software",
   "creators": [

@@ -9,5 +9,4 @@
         hemoglobin, albumin, alp, and ldh.
       * Treatment effects of ARPI plus ADT: survival difference, restricted mean
         survival time difference, and hazard ratio.
-      * Baseline hazards from 100 imputed datasets.
 

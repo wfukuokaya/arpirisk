@@ -15,10 +15,10 @@
 \title{Building blocks for the web calculator}
 \description{
 Lower-level functions used by the web calculator, which is developed in a
-separate repository (\url{https://github.com/wfukuokaya/mhspcarpi-app}) and
+separate repository (\url{https://github.com/wfukuokaya/arpirisk-app}) and
 calls them step by step. They may change between minor versions; analyses
-should use \code{\link[=predict_baseline_risk]{predict_baseline_risk()}}, \code{\link[=estimate_treatment_effect]{estimate_treatment_effect()}},
-\code{\link[=check_inputs]{check_inputs()}}, and \code{\link[=treatment_effect_curve]{treatment_effect_curve()}}.
+should use \code{\link[=predict_baseline_risk]{predict_baseline_risk()}}, \code{\link[=estimate_treatment_effect]{estimate_treatment_effect()}}, and
+\code{\link[=check_inputs]{check_inputs()}}.
 }
 \section{Functions}{
 

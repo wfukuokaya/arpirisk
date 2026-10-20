@@ -1,4 +1,4 @@
-url: https://wfukuokaya.github.io/mhspcarpi/
+url: https://wfukuokaya.github.io/arpirisk/
 template:
   bootstrap: 5
 
@@ -7,7 +7,6 @@ reference:
     contents:
       - predict_baseline_risk
       - estimate_treatment_effect
-      - treatment_effect_curve
   - title: Inputs and model
     contents:
       - model_inputs

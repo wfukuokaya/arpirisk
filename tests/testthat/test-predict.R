@@ -73,7 +73,7 @@ test_that("estimate_treatment_effect returns the requested scales in order", {
 test_that("values outside the development range trigger one warning and a note", {
   expect_warning(
     risk <- predict_baseline_risk(example_patient(hemoglobin = 50)),
-    class = "mhspcarpi_extrapolation_warning"
+    class = "arpirisk_extrapolation_warning"
   )
   expect_match(risk$notes, "extrapolation")
   expect_true(is.na(predict_baseline_risk(example_patient())$notes))

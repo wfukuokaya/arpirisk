@@ -30,18 +30,18 @@ test_that("valid patients pass with no warnings or notes", {
 })
 
 test_that("structural problems stop with informative errors", {
-  expect_error(check_inputs(list(psa = 1)), class = "mhspcarpi_input_error")
-  expect_error(check_inputs(example_patient()[0, ]), class = "mhspcarpi_input_error")
+  expect_error(check_inputs(list(psa = 1)), class = "arpirisk_input_error")
+  expect_error(check_inputs(example_patient()[0, ]), class = "arpirisk_input_error")
   expect_error(
     check_inputs(example_patient()[, -1]),
     "missing required column",
-    class = "mhspcarpi_input_error"
+    class = "arpirisk_input_error"
   )
 })
 
 test_that("missing and invalid values stop with row-level errors", {
   expect_input_error <- function(..., pattern) {
-    expect_error(check_inputs(example_patient(...)), pattern, class = "mhspcarpi_input_error")
+    expect_error(check_inputs(example_patient(...)), pattern, class = "arpirisk_input_error")
   }
   expect_input_error(psa = NA, pattern = "Prostate-specific antigen is missing")
   expect_input_error(psa = "high", pattern = "must be a number")
@@ -62,7 +62,7 @@ test_that("missing and invalid values stop with row-level errors", {
 test_that("only the first 8 errors are listed", {
   patients <- example_patient()[rep(1L, 10L), ]
   patients$psa <- NA
-  expect_error(check_inputs(patients), "And 2 more", class = "mhspcarpi_input_error")
+  expect_error(check_inputs(patients), "And 2 more", class = "arpirisk_input_error")
 })
 
 test_that("values outside the development range or above the cap are reported", {

@@ -1,4 +1,4 @@
-Package: mhspcarpi
+Package: arpirisk
 Title: ARPI Treatment Effects by Baseline Risk in Metastatic Prostate Cancer
 Version: 0.1.0.9000
 Authors@R:
@@ -13,9 +13,9 @@ Description: Implements a risk model, developed from individual participant
     difference in 4-year survival probability, the restricted mean survival
     time difference through 4 years, and the hazard ratio.
 License: MIT + file LICENSE
-URL: https://github.com/wfukuokaya/mhspcarpi,
-    https://wfukuokaya.github.io/mhspcarpi/
-BugReports: https://github.com/wfukuokaya/mhspcarpi/issues
+URL: https://github.com/wfukuokaya/arpirisk,
+    https://wfukuokaya.github.io/arpirisk/
+BugReports: https://github.com/wfukuokaya/arpirisk/issues
 Encoding: UTF-8
 Language: en-US
 LazyData: true

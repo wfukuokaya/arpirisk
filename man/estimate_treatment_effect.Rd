@@ -28,8 +28,8 @@ death.}
 \value{
 A data frame with one row per patient and scale: \code{row},
 \code{baseline_risk}, \code{scale}, \code{estimate}, the 95\% confidence interval
-(\code{conf_low}, \code{conf_high}), the 95\% prediction interval for a new trial
-population (\code{pred_low}, \code{pred_high}), \code{in_effect_range}, and \code{notes}.
+(\code{conf_low}, \code{conf_high}), \code{pred_low}, \code{pred_high}, \code{in_effect_range},
+and \code{notes}.
 }
 \description{
 Returns the pooled treatment effects of an androgen receptor pathway

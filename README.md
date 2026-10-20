@@ -1,26 +1,26 @@
-# mhspcarpi
+# arpirisk
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/wfukuokaya/mhspcarpi/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/wfukuokaya/mhspcarpi/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/wfukuokaya/arpirisk/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/wfukuokaya/arpirisk/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 Risk-based treatment effects of androgen receptor pathway inhibitors (ARPIs) in metastatic hormone-sensitive prostate cancer (mHSPC), from individual participant data of 4706 patients in LATITUDE, ARCHES, TITAN, and ARASENS.
 
-- **Baseline risk**: 4-year risk of all-cause death with placebo plus androgen deprivation therapy (ADT), from a Cox model stratified by trial with 9 predictors (restricted cubic splines for 5 laboratory values) and uniform shrinkage of the linear predictor; risks are averaged over the baseline cumulative hazards of 100 multiply imputed datasets.
-- **Treatment effects** of an ARPI plus ADT versus placebo plus ADT, modeled within each trial as smooth functions of the baseline-risk linear predictor and pooled by multivariate random-effects meta-analysis: the 4-year absolute risk difference (ARD), the restricted mean survival time difference through 4 years (ΔRMST), and the hazard ratio (HR), each with a 95% confidence interval and a 95% prediction interval. Effects are reported between the 1st and 99th percentiles of baseline risk in the trials.
+- **Baseline risk**: 4-year risk of all-cause death with placebo plus androgen deprivation therapy (ADT), from a Cox model stratified by trial with 9 predictors (restricted cubic splines for 5 laboratory values) and uniform shrinkage of the linear predictor.
+- **Treatment effects** of an ARPI plus ADT versus placebo plus ADT, modeled within each trial as smooth functions of the baseline-risk linear predictor and pooled by multivariate random-effects meta-analysis: the 4-year absolute risk difference (ARD), the restricted mean survival time difference through 4 years (ΔRMST), and the hazard ratio (HR), each with a 95% confidence interval.
 
-For research and education; not a medical device. The web calculator is at <https://github.com/wfukuokaya/mhspcarpi-app>.
+For research and education; not a medical device. The web calculator is at <https://github.com/wfukuokaya/arpirisk-app>.
 
 ## Installation
 
 ```r
-pak::pak("wfukuokaya/mhspcarpi")
+pak::pak("wfukuokaya/arpirisk")
 ```
 
 ## Usage
 
 ```r
-library(mhspcarpi)
+library(arpirisk)
 
 patient <- data.frame(
   ecog_ps = 0, gleason_score = 9, visceral_metastasis = 0, bone_metastases = 8,
@@ -28,13 +28,12 @@ patient <- data.frame(
 )
 
 predict_baseline_risk(patient)      # linear predictor and 4-year risk
-estimate_treatment_effect(patient)  # ARD, ΔRMST, and HR with 95% CI and PI
-treatment_effect_curve("ard")       # pooled curve across baseline risk
+estimate_treatment_effect(patient)  # ARD, ΔRMST, and HR with 95% CI
 check_inputs(patient)               # values outside the development data
 model_inputs()                      # inputs, units, accepted values, scoring
 ```
 
-See `vignette("mhspcarpi")`.
+See `vignette("arpirisk")`.
 
 ## Model
 
@@ -44,4 +43,4 @@ To update the model: run `data-raw/remote_golden_cases.R` after the analysis scr
 
 ## Citation
 
-`citation("mhspcarpi")`. The article will be added on publication.
+`citation("arpirisk")`. The article will be added on publication.

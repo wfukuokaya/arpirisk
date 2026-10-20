@@ -20,7 +20,7 @@ low_risk_patient <- function() {
 # Writes a modified copy of the installed specification and returns its path.
 modified_spec <- function(modify) {
   spec <- jsonlite::fromJSON(
-    system.file("extdata", "model_spec.json", package = "mhspcarpi"),
+    system.file("extdata", "model_spec.json", package = "arpirisk"),
     simplifyVector = TRUE,
     simplifyDataFrame = FALSE,
     simplifyMatrix = FALSE

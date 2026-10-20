@@ -1,4 +1,4 @@
-# Golden cases for mhspcarpi, generated with rms on the remote analysis PC.
+# Golden cases for arpirisk, generated with rms on the remote analysis PC.
 #
 # Run this in the same R session immediately after the analysis script (for
 # example 261002_script.R) finishes, so that fit_pooled, model_export, mv_fits,

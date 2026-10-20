@@ -1,11 +1,14 @@
-# mhspcarpi (development version)
+# arpirisk (development version)
 
-* `plot_treatment_effect()` is removed; plotting moved to the web calculator.
-  `treatment_effect_curve()` returns the curves for custom figures. graphics
-  and grDevices are no longer imported.
+* The package is renamed from mhspcarpi to arpirisk; the repository is
+  <https://github.com/wfukuokaya/arpirisk> and the web calculator
+  <https://github.com/wfukuokaya/arpirisk-app>.
+* `plot_treatment_effect()` and `treatment_effect_curve()` are removed;
+  plotting moved to the web calculator. graphics and grDevices are no longer
+  imported.
 * The vignette is written in Quarto, and the README is shorter.
 * The web calculator moved to its own repository,
-  <https://github.com/wfukuokaya/mhspcarpi-app>, which builds it from a pinned
+  <https://github.com/wfukuokaya/arpirisk-app>, which builds it from a pinned
   commit of this package. `run_app()` and `mhspc_app()` are removed, and shiny,
   bslib, htmltools, svglite, and shinylive are no longer suggested. The
   lower-level functions the calculator calls are exported and documented in
@@ -35,7 +38,7 @@
   "This patient" label is placed above or below the curve, whichever keeps it
   closer to the marker without crossing the curve.
 
-# mhspcarpi 0.1.0
+# arpirisk 0.1.0
 
 * Model version 261002-raw-rcs replaces 260803-raw-rcs. Its linear-predictor
   center matches the baseline hazards, which raises predicted risks; the

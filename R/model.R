@@ -5,8 +5,8 @@
 #' functions call it by default, so most users never need to call it directly.
 #'
 #' The specification contains only aggregate quantities: the risk-model
-#' coefficients and spline knots, the 4-year baseline cumulative hazards from
-#' the multiply imputed datasets, and the pooled treatment-effect curves.
+#' coefficients and spline knots, the 4-year baseline cumulative hazards, and
+#' the pooled treatment-effect curves.
 #'
 #' @param path Path to a model specification file. The default, `NULL`, uses
 #'   the specification installed with the package.
@@ -29,7 +29,7 @@ model_cache <- new.env(parent = emptyenv())
 
 # Held in a variable so dependency scanners do not treat the package as a
 # dependency of the Shinylive app, which sources these files directly.
-package_name <- "mhspcarpi"
+package_name <- "arpirisk"
 
 installed_spec_path <- function(call = rlang::caller_env()) {
   path <- system.file("extdata", "model_spec.json", package = package_name)
@@ -39,7 +39,7 @@ installed_spec_path <- function(call = rlang::caller_env()) {
         "The installed model specification was not found.",
         i = "Supply {.arg path} to {.fn mhspc_model}."
       ),
-      class = "mhspcarpi_spec_error",
+      class = "arpirisk_spec_error",
       call = call
     )
   }
@@ -50,7 +50,7 @@ read_model_spec <- function(path, call = rlang::caller_env()) {
   if (!rlang::is_string(path) || !file.exists(path)) {
     cli::cli_abort(
       "{.arg path} must be the path to an existing model specification file.",
-      class = "mhspcarpi_spec_error",
+      class = "arpirisk_spec_error",
       call = call
     )
   }
@@ -94,7 +94,7 @@ validate_mhspc_model <- function(model, call = rlang::caller_env()) {
   spec_abort <- function(message) {
     cli::cli_abort(
       c("The model specification is invalid.", x = message),
-      class = "mhspcarpi_spec_error",
+      class = "arpirisk_spec_error",
       call = call
     )
   }
@@ -226,8 +226,7 @@ print.mhspc_model <- function(x, ...) {
     "*" = paste(
       "Treatment effects of {meta$comparator_strategy}: survival difference,",
       "restricted mean survival time difference, and hazard ratio."
-    ),
-    "*" = "Baseline hazards from {length(x$baseline_cumulative_hazard)} imputed datasets."
+    )
   ))
   invisible(x)
 }
@@ -236,7 +235,7 @@ check_model <- function(model, call = rlang::caller_env()) {
   if (!inherits(model, "mhspc_model")) {
     cli::cli_abort(
       "{.arg model} must be an {.cls mhspc_model} object from {.fn mhspc_model}.",
-      class = "mhspcarpi_spec_error",
+      class = "arpirisk_spec_error",
       call = call
     )
   }

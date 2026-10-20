@@ -34,8 +34,7 @@ are indexed on this baseline risk.
 }
 \details{
 The linear predictor is the shrunken, centered Cox linear predictor for
-placebo plus ADT. Risk is averaged over the baseline cumulative hazards
-estimated in the multiply imputed datasets.
+placebo plus ADT.
 }
 \examples{
 patient <- data.frame(

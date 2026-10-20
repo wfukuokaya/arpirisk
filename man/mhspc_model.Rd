@@ -20,8 +20,8 @@ functions call it by default, so most users never need to call it directly.
 }
 \details{
 The specification contains only aggregate quantities: the risk-model
-coefficients and spline knots, the 4-year baseline cumulative hazards from
-the multiply imputed datasets, and the pooled treatment-effect curves.
+coefficients and spline knots, the 4-year baseline cumulative hazards, and
+the pooled treatment-effect curves.
 }
 \examples{
 mhspc_model()

@@ -1,4 +1,4 @@
 library(testthat)
-library(mhspcarpi)
+library(arpirisk)
 
-test_check("mhspcarpi")
+test_check("arpirisk")

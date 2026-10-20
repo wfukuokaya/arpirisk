@@ -70,7 +70,7 @@ prepare_inputs <- function(newdata, model, call = rlang::caller_env()) {
         "{length(unique(warnings$row))} patient{?s} {?has/have} values outside the range in the trial data.",
         i = "Their estimates are extrapolations; see the {.field notes} column."
       ),
-      class = "mhspcarpi_extrapolation_warning"
+      class = "arpirisk_extrapolation_warning"
     )
   }
   assessment
@@ -82,14 +82,14 @@ assess_inputs <- function(newdata, model, call = rlang::caller_env()) {
   if (!is.data.frame(newdata)) {
     cli::cli_abort(
       "{.arg newdata} must be a data frame, not {.obj_type_friendly {newdata}}.",
-      class = "mhspcarpi_input_error",
+      class = "arpirisk_input_error",
       call = call
     )
   }
   if (nrow(newdata) == 0L) {
     cli::cli_abort(
       "{.arg newdata} must have at least one row.",
-      class = "mhspcarpi_input_error",
+      class = "arpirisk_input_error",
       call = call
     )
   }
@@ -100,7 +100,7 @@ assess_inputs <- function(newdata, model, call = rlang::caller_env()) {
         "{.arg newdata} is missing required column{?s} {.field {missing_columns}}.",
         i = "See {.fn model_inputs} for the required inputs."
       ),
-      class = "mhspcarpi_input_error",
+      class = "arpirisk_input_error",
       call = call
     )
   }
@@ -282,7 +282,7 @@ abort_on_input_errors <- function(issues, model, call = rlang::caller_env()) {
   }
   cli::cli_abort(
     c("{.arg newdata} has invalid or missing values.", bullets),
-    class = "mhspcarpi_input_error",
+    class = "arpirisk_input_error",
     call = call
   )
 }

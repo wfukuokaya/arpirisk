@@ -4,7 +4,7 @@
 _site/
 docs/
 *.Rcheck/
-mhspcarpi_*.tar.gz
+arpirisk_*.tar.gz
 .DS_Store
 inst/doc
 /doc/

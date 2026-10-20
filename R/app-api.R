@@ -1,10 +1,10 @@
 #' Building blocks for the web calculator
 #'
 #' Lower-level functions used by the web calculator, which is developed in a
-#' separate repository (<https://github.com/wfukuokaya/mhspcarpi-app>) and
+#' separate repository (<https://github.com/wfukuokaya/arpirisk-app>) and
 #' calls them step by step. They may change between minor versions; analyses
-#' should use [predict_baseline_risk()], [estimate_treatment_effect()],
-#' [check_inputs()], and [treatment_effect_curve()].
+#' should use [predict_baseline_risk()], [estimate_treatment_effect()], and
+#' [check_inputs()].
 #'
 #' @section Functions:
 #' - `check_model(model)` validates a model specification.

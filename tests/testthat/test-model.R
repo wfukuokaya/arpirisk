@@ -11,7 +11,7 @@ test_that("the installed model loads, validates, and is cached", {
 })
 
 test_that("a specification path is read without touching the cache", {
-  path <- system.file("extdata", "model_spec.json", package = "mhspcarpi")
+  path <- system.file("extdata", "model_spec.json", package = "arpirisk")
   model <- mhspc_model(path)
   expect_s3_class(model, "mhspc_model")
   expect_equal(model$meta, mhspc_model()$meta)
@@ -23,10 +23,10 @@ test_that("the model prints a short summary", {
 
 test_that("invalid specifications are rejected", {
   expect_spec_error <- function(modify) {
-    expect_error(mhspc_model(modified_spec(modify)), class = "mhspcarpi_spec_error")
+    expect_error(mhspc_model(modified_spec(modify)), class = "arpirisk_spec_error")
   }
-  expect_error(mhspc_model("no-such-file.json"), class = "mhspcarpi_spec_error")
-  expect_error(mhspc_model(1), class = "mhspcarpi_spec_error")
+  expect_error(mhspc_model("no-such-file.json"), class = "arpirisk_spec_error")
+  expect_error(mhspc_model(1), class = "arpirisk_spec_error")
 
   expect_spec_error(function(spec) {
     spec$schema_version <- 3L
@@ -130,18 +130,18 @@ test_that("linear continuous terms are supported and validated", {
   lp <- function(alp) predict_baseline_risk(example_patient(alp = alp), model)$linear_predictor
   expect_equal(lp(280) - lp(180), 100 * 0.001 * model$linear_predictor$shrinkage_factor)
 
-  expect_error(mhspc_model(modified_spec(make_linear(c(0.001, 0.002)))), class = "mhspcarpi_spec_error")
+  expect_error(mhspc_model(modified_spec(make_linear(c(0.001, 0.002)))), class = "arpirisk_spec_error")
   expect_error(
     mhspc_model(modified_spec(function(spec) {
       spec$predictors[[8L]]$allowed_range <- c(10, 0)
       spec
     })),
-    class = "mhspcarpi_spec_error"
+    class = "arpirisk_spec_error"
   )
   expect_equal(unit_hint(model$predictors$hemoglobin, NA_real_, "g/L"), "")
 })
 
 test_that("functions require an mhspc_model object", {
-  expect_error(model_inputs(list()), class = "mhspcarpi_spec_error")
-  expect_error(predict_baseline_risk(example_patient(), model = "model"), class = "mhspcarpi_spec_error")
+  expect_error(model_inputs(list()), class = "arpirisk_spec_error")
+  expect_error(predict_baseline_risk(example_patient(), model = "model"), class = "arpirisk_spec_error")
 })

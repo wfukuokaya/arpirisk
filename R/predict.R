@@ -5,8 +5,7 @@
 #' are indexed on this baseline risk.
 #'
 #' The linear predictor is the shrunken, centered Cox linear predictor for
-#' placebo plus ADT. Risk is averaged over the baseline cumulative hazards
-#' estimated in the multiply imputed datasets.
+#' placebo plus ADT.
 #'
 #' @inheritParams check_inputs
 #'
@@ -60,8 +59,8 @@ predict_baseline_risk <- function(newdata, model = mhspc_model()) {
 #'
 #' @return A data frame with one row per patient and scale: `row`,
 #'   `baseline_risk`, `scale`, `estimate`, the 95% confidence interval
-#'   (`conf_low`, `conf_high`), the 95% prediction interval for a new trial
-#'   population (`pred_low`, `pred_high`), `in_effect_range`, and `notes`.
+#'   (`conf_low`, `conf_high`), `pred_low`, `pred_high`, `in_effect_range`,
+#'   and `notes`.
 #' @examples
 #' patient <- data.frame(
 #'   ecog_ps = 0, gleason_score = 9, visceral_metastasis = 0,
