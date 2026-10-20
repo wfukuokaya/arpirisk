@@ -8,8 +8,6 @@
   : Estimate treatment effects at a patient's baseline risk
 - [`treatment_effect_curve()`](https://wfukuokaya.github.io/mhspcarpi/reference/treatment_effect_curve.md)
   : Treatment effects across the range of baseline risk
-- [`plot_treatment_effect()`](https://wfukuokaya.github.io/mhspcarpi/reference/plot_treatment_effect.md)
-  : Plot treatment effects across baseline risk
 
 ## Inputs and model
 

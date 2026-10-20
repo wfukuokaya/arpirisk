@@ -2,6 +2,12 @@
 
 ## mhspcarpi (development version)
 
+- `plot_treatment_effect()` is removed; plotting moved to the web
+  calculator.
+  [`treatment_effect_curve()`](https://wfukuokaya.github.io/mhspcarpi/reference/treatment_effect_curve.md)
+  returns the curves for custom figures. graphics and grDevices are no
+  longer imported.
+- The vignette is written in Quarto, and the README is shorter.
 - The web calculator moved to its own repository,
   <https://github.com/wfukuokaya/mhspcarpi-app>, which builds it from a
   pinned commit of this package. `run_app()` and `mhspc_app()` are

@@ -1,15 +1,10 @@
 # Get started with mhspcarpi
 
-mhspcarpi scores patients with metastatic hormone-sensitive prostate
-cancer (mHSPC) on a risk model developed from individual participant
-data of 4 placebo-controlled randomized clinical trials of androgen
-receptor pathway inhibitors (ARPIs). For each patient it returns:
-
-- the risk of death within 4 years with placebo plus androgen
-  deprivation therapy (ADT), called baseline risk; and
-- the pooled treatment effects of an ARPI plus ADT versus placebo plus
-  ADT at that baseline risk, each with a 95% confidence interval and a
-  95% prediction interval.
+mhspcarpi predicts the 4-year risk of all-cause death with placebo plus
+androgen deprivation therapy (ADT), called baseline risk, in metastatic
+hormone-sensitive prostate cancer (mHSPC), and returns the pooled
+treatment effects of an androgen receptor pathway inhibitor (ARPI) plus
+ADT at that baseline risk.
 
 ``` r
 
@@ -19,13 +14,13 @@ library(mhspcarpi)
 ## Inputs
 
 [`model_inputs()`](https://wfukuokaya.github.io/mhspcarpi/reference/model_inputs.md)
-lists the 9 inputs, the column names expected in a data frame, the
-units, and what to enter.
+lists the 9 predictors with their column names, units, accepted values,
+and scoring. `example_patients` contains 6 synthetic patients spanning
+the range of baseline risk.
 
 ``` r
 
-inputs <- model_inputs()
-inputs[c("name", "unit", "accepted", "scoring")]
+model_inputs()[c("name", "unit", "accepted", "scoring")]
 #>                  name  unit                                            accepted
 #> 1             ecog_ps  <NA>                                             0, 1, 2
 #> 2       gleason_score  <NA>                          2, 3, 4, 5, 6, 7, 8, 9, 10
@@ -46,13 +41,6 @@ inputs[c("name", "unit", "accepted", "scoring")]
 #> 7                                        Restricted cubic spline; trial data 24 to 61.5
 #> 8 Restricted cubic spline; trial data 26 to 7,680; values above 4,824 scored at the cap
 #> 9 Restricted cubic spline; trial data 67 to 4,124; values above 1,470 scored at the cap
-```
-
-The package includes 6 synthetic patients that span the range of
-baseline risk.
-
-``` r
-
 example_patients
 #>   patient_id ecog_ps gleason_score visceral_metastasis bone_metastases psa
 #> 1         P1       0             7                   0               0   5
@@ -73,14 +61,13 @@ example_patients
 ## Baseline risk
 
 [`predict_baseline_risk()`](https://wfukuokaya.github.io/mhspcarpi/reference/predict_baseline_risk.md)
-returns one row per patient. The `notes` column reports values outside
-the range observed in the trials and baseline risks outside the range in
-which treatment effects were estimated.
+returns the shrunken, centered linear predictor and the 4-year risk. The
+`notes` column flags values outside the development data and baseline
+risks outside the range in which treatment effects were estimated.
 
 ``` r
 
-risk <- predict_baseline_risk(example_patients)
-risk
+predict_baseline_risk(example_patients)
 #>   row linear_predictor baseline_risk in_effect_range
 #> 1   1       -0.6579870     0.1963982            TRUE
 #> 2   2       -0.3946690     0.2476209            TRUE
@@ -100,66 +87,32 @@ risk
 ## Treatment effects
 
 [`estimate_treatment_effect()`](https://wfukuokaya.github.io/mhspcarpi/reference/estimate_treatment_effect.md)
-returns the effects at each patient’s baseline risk in long format. The
-`ard` scale is the difference in the probability of being alive at 4
-years, `rmst` is the difference in restricted mean survival time through
-4 years in months, and `hr` is the hazard ratio for death.
+returns, in long format, the absolute risk difference at 4 years
+(`ard`), the restricted mean survival time difference through 4 years in
+months (`rmst`), and the hazard ratio (`hr`), each with a 95% confidence
+interval (`conf_low`, `conf_high`) and a 95% prediction interval for a
+new trial population (`pred_low`, `pred_high`).
 
 ``` r
 
-effects <- estimate_treatment_effect(example_patients, scale = c("ard", "rmst"))
-effects[c("row", "baseline_risk", "scale", "estimate", "conf_low", "conf_high")]
-#>    row baseline_risk scale     estimate      conf_low  conf_high
-#> 1    1     0.1963982   ard 0.0002832789 -0.0945278628 0.09509442
-#> 2    1     0.1963982  rmst 0.6177354572 -1.3767451335 2.61221605
-#> 3    2     0.2476209   ard 0.0556955429  0.0009928562 0.11039823
-#> 4    2     0.2476209  rmst 0.9992638106 -0.1532595655 2.15178719
-#> 5    3     0.6160547   ard 0.1564764237  0.1044090043 0.20854384
-#> 6    3     0.6160547  rmst 5.0448803573  3.5714696551 6.51829106
-#> 7    4     0.8956950   ard 0.1276327083  0.0643407300 0.19092469
-#> 8    4     0.8956950  rmst 3.9459309396  1.4116989980 6.48016288
-#> 9    5     0.8519254   ard 0.1339398816  0.0803733946 0.18750637
-#> 10   5     0.8519254  rmst 4.3633263343  2.3639661945 6.36268647
-#> 11   6     0.9846912   ard 0.1131768664  0.0145535338 0.21180020
-#> 12   6     0.9846912  rmst 2.9881088602 -1.0341336556 7.01035138
+effects <- estimate_treatment_effect(example_patients)
+effects[effects$row == 3, c("scale", "estimate", "conf_low", "conf_high", "pred_low", "pred_high")]
+#>   scale  estimate  conf_low conf_high   pred_low pred_high
+#> 7   ard 0.1564764 0.1044090 0.2085438 0.04217641 0.2707764
+#> 8  rmst 5.0448804 3.5714697 6.5182911 1.74810649 8.3416542
+#> 9    hr 0.6037809 0.5201066 0.7009167 0.42913587 0.8495010
 ```
 
-Patients whose baseline risk falls outside the 1st to 99th percentiles
-of the trials receive the effect at the nearest edge of that range, with
-`in_effect_range` set to `FALSE`.
+Baseline risks outside the 1st to 99th percentiles of the trials receive
+the effect at the nearest edge of that range, with
+`in_effect_range = FALSE`.
 
-## Checking data before scoring
-
-[`check_inputs()`](https://wfukuokaya.github.io/mhspcarpi/reference/check_inputs.md)
-stops with an informative error when a value is missing or impossible,
-and returns warnings and notes for values outside the trial range.
-
-``` r
-
-check_inputs(data.frame(example_patients[1, ], hemoglobin = -1))
-#> [1] row      input    severity message 
-#> <0 rows> (or 0-length row.names)
-```
-
-## Plotting
-
-[`plot_treatment_effect()`](https://wfukuokaya.github.io/mhspcarpi/reference/plot_treatment_effect.md)
-draws the pooled effect across baseline risk, with the patients in
-`newdata` marked.
 [`treatment_effect_curve()`](https://wfukuokaya.github.io/mhspcarpi/reference/treatment_effect_curve.md)
-returns the plotted curve for custom figures.
+returns the pooled curves across baseline risk, for figures or tables.
 
 ``` r
 
-plot_treatment_effect(example_patients[2, ], scale = "ard")
-```
-
-![](mhspcarpi_files/figure-html/unnamed-chunk-7-1.png)
-
-``` r
-
-curve <- treatment_effect_curve("rmst")
-head(curve)
+head(treatment_effect_curve("rmst"))
 #>   linear_predictor baseline_risk scale  estimate   conf_low conf_high  pred_low
 #> 1       -0.7167630     0.1863059  rmst 0.5330103 -1.6883115  2.754332 -4.998805
 #> 2       -0.6886720     0.1910711  rmst 0.5735032 -1.5384792  2.685486 -4.693962
@@ -176,10 +129,34 @@ head(curve)
 #> 6  4.982883
 ```
 
-## Model specification
+## Checking inputs
 
-The model is stored as aggregate parameters in a JSON file installed
-with the package. No participant-level data are included.
+[`check_inputs()`](https://wfukuokaya.github.io/mhspcarpi/reference/check_inputs.md)
+stops with an informative error for missing or impossible values and
+returns warnings and notes for values outside the development data.
+
+``` r
+
+patient <- example_patients[1, ]
+patient$hemoglobin <- -1
+check_inputs(patient)
+#> Error in `check_inputs()`:
+#> ! `newdata` has invalid or missing values.
+#> ✖ Row 1: Hemoglobin must be between 20 and 250 g/L.
+```
+
+``` r
+
+patient$hemoglobin <- 150
+patient$psa <- 20000
+check_inputs(patient)
+#>   row input severity
+#> 1   1   psa     note
+#>                                                                                                  message
+#> 1 Prostate-specific antigen values above 8,322 ng/mL are scored as 8,322 ng/mL, as in model development.
+```
+
+## Model specification
 
 ``` r
 

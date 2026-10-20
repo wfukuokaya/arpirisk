@@ -7,7 +7,6 @@ analyses should use
 [`predict_baseline_risk()`](https://wfukuokaya.github.io/mhspcarpi/reference/predict_baseline_risk.md),
 [`estimate_treatment_effect()`](https://wfukuokaya.github.io/mhspcarpi/reference/estimate_treatment_effect.md),
 [`check_inputs()`](https://wfukuokaya.github.io/mhspcarpi/reference/check_inputs.md),
-[`plot_treatment_effect()`](https://wfukuokaya.github.io/mhspcarpi/reference/plot_treatment_effect.md),
 and
 [`treatment_effect_curve()`](https://wfukuokaya.github.io/mhspcarpi/reference/treatment_effect_curve.md).
 
@@ -26,7 +25,3 @@ and
   `in_effect_range(lp, model)`, `effect_at_lp(lp, model, scale)`, and
   `effect_risk_range(model)` compute the baseline risk and the treatment
   effects from values on the model's scale.
-
-- `effect_scales()`, `effect_curve(model, scale)`,
-  `overall_effect(model, scale)`, `effect_plot_par()`, and
-  `draw_effect_plot(curve, scale, ...)` draw the treatment-effect plot.

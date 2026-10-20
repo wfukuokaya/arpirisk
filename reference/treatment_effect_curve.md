@@ -1,10 +1,8 @@
 # Treatment effects across the range of baseline risk
 
 Returns the pooled treatment-effect curves on the grid of baseline risk
-used in the analysis, for example to draw a custom figure or to tabulate
+used in the analysis, for example to draw a figure or to tabulate
 effects.
-[`plot_treatment_effect()`](https://wfukuokaya.github.io/mhspcarpi/reference/plot_treatment_effect.md)
-draws the same curves.
 
 ## Usage
 

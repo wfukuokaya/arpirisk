@@ -52,16 +52,14 @@
 </h1></div>
 <!-- badges: start -->
 
-<p>mhspcarpi implements a risk model for patients with metastatic hormone-sensitive prostate cancer (mHSPC) and the treatment effects of androgen receptor pathway inhibitors (ARPIs) across baseline risk. The model was developed from individual participant data of 4706 patients in 4 placebo-controlled randomized clinical trials (LATITUDE, ARCHES, TITAN, and ARASENS).</p>
-<p>For each patient, the package estimates:</p>
+<p>Risk-based treatment effects of androgen receptor pathway inhibitors (ARPIs) in metastatic hormone-sensitive prostate cancer (mHSPC), from individual participant data of 4706 patients in LATITUDE, ARCHES, TITAN, and ARASENS.</p>
 <ul>
-<li>the risk of death within 4 years with placebo plus androgen deprivation therapy (ADT), called baseline risk; and</li>
-<li>the pooled effects of an ARPI plus ADT versus placebo plus ADT at that baseline risk: the difference in the probability of being alive at 4 years, the restricted mean survival time difference through 4 years, and the hazard ratio, each with a 95% confidence interval and a 95% prediction interval.</li>
+<li>
+<strong>Baseline risk</strong>: 4-year risk of all-cause death with placebo plus androgen deprivation therapy (ADT), from a Cox model stratified by trial with 9 predictors (restricted cubic splines for 5 laboratory values) and uniform shrinkage of the linear predictor; risks are averaged over the baseline cumulative hazards of 100 multiply imputed datasets.</li>
+<li>
+<strong>Treatment effects</strong> of an ARPI plus ADT versus placebo plus ADT, modeled within each trial as smooth functions of the baseline-risk linear predictor and pooled by multivariate random-effects meta-analysis: the 4-year absolute risk difference (ARD), the restricted mean survival time difference through 4 years (ΔRMST), and the hazard ratio (HR), each with a 95% confidence interval and a 95% prediction interval. Effects are reported between the 1st and 99th percentiles of baseline risk in the trials.</li>
 </ul>
-<p>For research and education; not a medical device.</p>
-<blockquote>
-<p><strong>Status:</strong> version 0.1.0 accompanies a manuscript under peer review and uses model version 261002-raw-rcs. The package reproduces the reference profiles scored by the analysis code; the check against <code>rms</code> golden cases from the same analysis run (<code>data-raw/remote_golden_cases.R</code>) is pending.</p>
-</blockquote>
+<p>For research and education; not a medical device. The web calculator is at <a href="https://github.com/wfukuokaya/mhspcarpi-app" class="external-link uri">https://github.com/wfukuokaya/mhspcarpi-app</a>.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -75,95 +73,27 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/wfukuokaya/mhspcarpi" class="external-link">mhspcarpi</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">patient</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  ecog_ps <span class="op">=</span> <span class="fl">0</span>,              <span class="co"># 0, 1, or 2</span></span>
-<span>  gleason_score <span class="op">=</span> <span class="fl">9</span>,        <span class="co"># 2 to 10</span></span>
-<span>  visceral_metastasis <span class="op">=</span> <span class="fl">0</span>,  <span class="co"># 0 or 1</span></span>
-<span>  bone_metastases <span class="op">=</span> <span class="fl">8</span>,      <span class="co"># count, or "0-3", "4-6", "7-10", "11+"</span></span>
-<span>  psa <span class="op">=</span> <span class="fl">45</span>,                 <span class="co"># ng/mL</span></span>
-<span>  hemoglobin <span class="op">=</span> <span class="fl">128</span>,         <span class="co"># g/L</span></span>
-<span>  albumin <span class="op">=</span> <span class="fl">41</span>,             <span class="co"># g/L</span></span>
-<span>  alp <span class="op">=</span> <span class="fl">180</span>,                <span class="co"># U/L</span></span>
-<span>  ldh <span class="op">=</span> <span class="fl">210</span>                 <span class="co"># U/L</span></span>
+<span>  ecog_ps <span class="op">=</span> <span class="fl">0</span>, gleason_score <span class="op">=</span> <span class="fl">9</span>, visceral_metastasis <span class="op">=</span> <span class="fl">0</span>, bone_metastases <span class="op">=</span> <span class="fl">8</span>,</span>
+<span>  psa <span class="op">=</span> <span class="fl">45</span>, hemoglobin <span class="op">=</span> <span class="fl">128</span>, albumin <span class="op">=</span> <span class="fl">41</span>, alp <span class="op">=</span> <span class="fl">180</span>, ldh <span class="op">=</span> <span class="fl">210</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="reference/predict_baseline_risk.html">predict_baseline_risk</a></span><span class="op">(</span><span class="va">patient</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/estimate_treatment_effect.html">estimate_treatment_effect</a></span><span class="op">(</span><span class="va">patient</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/plot_treatment_effect.html">plot_treatment_effect</a></span><span class="op">(</span><span class="va">patient</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/treatment_effect_curve.html">treatment_effect_curve</a></span><span class="op">(</span><span class="st">"ard"</span><span class="op">)</span></span></code></pre></div>
-<p><code><a href="reference/model_inputs.html">model_inputs()</a></code> lists the inputs, units, accepted values, and definitions. <code><a href="reference/check_inputs.html">check_inputs()</a></code> reports values outside the range observed in the trials; their estimates are extrapolations. <code>example_patients</code> contains 6 synthetic patients spanning the range of baseline risk. See <code><a href="articles/mhspcarpi.html">vignette("mhspcarpi")</a></code> for a walkthrough.</p>
+<span><span class="fu"><a href="reference/predict_baseline_risk.html">predict_baseline_risk</a></span><span class="op">(</span><span class="va">patient</span><span class="op">)</span>      <span class="co"># linear predictor and 4-year risk</span></span>
+<span><span class="fu"><a href="reference/estimate_treatment_effect.html">estimate_treatment_effect</a></span><span class="op">(</span><span class="va">patient</span><span class="op">)</span>  <span class="co"># ARD, ΔRMST, and HR with 95% CI and PI</span></span>
+<span><span class="fu"><a href="reference/treatment_effect_curve.html">treatment_effect_curve</a></span><span class="op">(</span><span class="st">"ard"</span><span class="op">)</span>       <span class="co"># pooled curve across baseline risk</span></span>
+<span><span class="fu"><a href="reference/check_inputs.html">check_inputs</a></span><span class="op">(</span><span class="va">patient</span><span class="op">)</span>               <span class="co"># values outside the development data</span></span>
+<span><span class="fu"><a href="reference/model_inputs.html">model_inputs</a></span><span class="op">(</span><span class="op">)</span>                      <span class="co"># inputs, units, accepted values, scoring</span></span></code></pre></div>
+<p>See <code><a href="articles/mhspcarpi.html">vignette("mhspcarpi")</a></code>.</p>
 </div>
 <div class="section level2">
-<h2 id="model-specification">Model specification<a class="anchor" aria-label="anchor" href="#model-specification"></a>
+<h2 id="model">Model<a class="anchor" aria-label="anchor" href="#model"></a>
 </h2>
-<p>The model is stored as aggregate parameters in <code>inst/extdata/model_spec.json</code>: risk-model coefficients and spline knots, the 4-year baseline cumulative hazards from the multiply imputed datasets, and the pooled treatment-effect curves. No participant-level data are included.</p>
-<p>The specification is generated from the analysis export with <code>data-raw/build_model_spec.R</code>. Tests check the package against reference profiles scored by the analysis code and, when available, against golden cases computed with <code>rms</code> on the analysis computer (<code>data-raw/remote_golden_cases.R</code>). <code>data-raw/synthetic_cohort_check.R</code> runs the analysis export code on a simulated cohort; the tests compare the package with <code>rms</code> predictions and with the true risks of that simulation.</p>
-</div>
-<div class="section level2">
-<h2 id="updating-the-model">Updating the model<a class="anchor" aria-label="anchor" href="#updating-the-model"></a>
-</h2>
-<p>The analysis runs on a separate computer with the participant-level data; this repository receives only its aggregate export.</p>
-<ol style="list-style-type: decimal">
-<li>After the analysis script finishes, run <code>data-raw/remote_golden_cases.R</code> in the same R session. It writes <code>golden_cases.csv</code> and stops if the exported linear predictor is not aligned with the baseline hazards and effect curves.</li>
-<li>Rebuild the specification: <code>Rscript data-raw/build_model_spec.R path/to/model_export.txt</code>.</li>
-<li>Copy <code>golden_cases.csv</code> to <code>tests/testthat/fixtures/</code> and run the tests.</li>
-<li>Update the version and <code>NEWS.md</code>.</li>
-</ol>
-</div>
-<div class="section level2">
-<h2 id="repository-layout">Repository layout<a class="anchor" aria-label="anchor" href="#repository-layout"></a>
-</h2>
-<table class="table">
-<colgroup>
-<col width="50%">
-<col width="50%">
-</colgroup>
-<thead><tr>
-<th>Path</th>
-<th>Contents</th>
-</tr></thead>
-<tbody>
-<tr>
-<td><code>R/</code></td>
-<td>Package functions</td>
-</tr>
-<tr>
-<td><code>inst/extdata/model_spec.json</code></td>
-<td>Model specification (aggregate parameters)</td>
-</tr>
-<tr>
-<td><code>data-raw/</code></td>
-<td>Scripts that build the specification, golden cases, the synthetic-cohort check, and <code>example_patients</code>
-</td>
-</tr>
-<tr>
-<td><code>tests/testthat/</code></td>
-<td>Tests, with synthetic fixtures in <code>fixtures/synthetic/</code>
-</td>
-</tr>
-<tr>
-<td><code>vignettes/</code></td>
-<td>“Get started” vignette</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section level2">
-<h2 id="development">Development<a class="anchor" aria-label="anchor" href="#development"></a>
-</h2>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_package.html" class="external-link">test_local</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu">lintr</span><span class="fu">::</span><span class="fu">lint_package</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu">rcmdcheck</span><span class="fu">::</span><span class="fu"><a href="http://r-lib.github.io/rcmdcheck/reference/rcmdcheck.html" class="external-link">rcmdcheck</a></span><span class="op">(</span>args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"--no-manual"</span>, <span class="st">"--as-cran"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a>
-</h2>
-<p>No participant-level data are included. The model specification contains aggregate parameters only, and all test fixtures are simulated.</p>
+<p>The model (version 261002-raw-rcs) is stored as aggregate parameters in <code>inst/extdata/model_spec.json</code>, built from the analysis export with <code>data-raw/build_model_spec.R</code>. Tests compare the package with reference profiles scored by the analysis code and with a simulated cohort (<code>data-raw/synthetic_cohort_check.R</code>); comparison with <code>rms</code> predictions from the analysis run (<code>data-raw/remote_golden_cases.R</code>) is pending.</p>
+<p>To update the model: run <code>data-raw/remote_golden_cases.R</code> after the analysis script, rebuild the specification with <code>Rscript data-raw/build_model_spec.R path/to/model_export.txt</code>, add <code>golden_cases.csv</code> to <code>tests/testthat/fixtures/</code>, run the tests, and update the version and <code>NEWS.md</code>.</p>
 </div>
 <div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
 </h2>
-<p><code>citation("mhspcarpi")</code> gives the package citation. The article will be added on publication.</p>
+<p><code>citation("mhspcarpi")</code>. The article will be added on publication.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">

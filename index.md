@@ -1,29 +1,27 @@
 # mhspcarpi
 
-mhspcarpi implements a risk model for patients with metastatic
-hormone-sensitive prostate cancer (mHSPC) and the treatment effects of
-androgen receptor pathway inhibitors (ARPIs) across baseline risk. The
-model was developed from individual participant data of 4706 patients in
-4 placebo-controlled randomized clinical trials (LATITUDE, ARCHES,
-TITAN, and ARASENS).
+Risk-based treatment effects of androgen receptor pathway inhibitors
+(ARPIs) in metastatic hormone-sensitive prostate cancer (mHSPC), from
+individual participant data of 4706 patients in LATITUDE, ARCHES, TITAN,
+and ARASENS.
 
-For each patient, the package estimates:
+- **Baseline risk**: 4-year risk of all-cause death with placebo plus
+  androgen deprivation therapy (ADT), from a Cox model stratified by
+  trial with 9 predictors (restricted cubic splines for 5 laboratory
+  values) and uniform shrinkage of the linear predictor; risks are
+  averaged over the baseline cumulative hazards of 100 multiply imputed
+  datasets.
+- **Treatment effects** of an ARPI plus ADT versus placebo plus ADT,
+  modeled within each trial as smooth functions of the baseline-risk
+  linear predictor and pooled by multivariate random-effects
+  meta-analysis: the 4-year absolute risk difference (ARD), the
+  restricted mean survival time difference through 4 years (ΔRMST), and
+  the hazard ratio (HR), each with a 95% confidence interval and a 95%
+  prediction interval. Effects are reported between the 1st and 99th
+  percentiles of baseline risk in the trials.
 
-- the risk of death within 4 years with placebo plus androgen
-  deprivation therapy (ADT), called baseline risk; and
-- the pooled effects of an ARPI plus ADT versus placebo plus ADT at that
-  baseline risk: the difference in the probability of being alive at 4
-  years, the restricted mean survival time difference through 4 years,
-  and the hazard ratio, each with a 95% confidence interval and a 95%
-  prediction interval.
-
-For research and education; not a medical device.
-
-> **Status:** version 0.1.0 accompanies a manuscript under peer review
-> and uses model version 261002-raw-rcs. The package reproduces the
-> reference profiles scored by the analysis code; the check against
-> `rms` golden cases from the same analysis run
-> (`data-raw/remote_golden_cases.R`) is pending.
+For research and education; not a medical device. The web calculator is
+at <https://github.com/wfukuokaya/mhspcarpi-app>.
 
 ## Installation
 
@@ -39,89 +37,35 @@ pak::pak("wfukuokaya/mhspcarpi")
 library(mhspcarpi)
 
 patient <- data.frame(
-  ecog_ps = 0,              # 0, 1, or 2
-  gleason_score = 9,        # 2 to 10
-  visceral_metastasis = 0,  # 0 or 1
-  bone_metastases = 8,      # count, or "0-3", "4-6", "7-10", "11+"
-  psa = 45,                 # ng/mL
-  hemoglobin = 128,         # g/L
-  albumin = 41,             # g/L
-  alp = 180,                # U/L
-  ldh = 210                 # U/L
+  ecog_ps = 0, gleason_score = 9, visceral_metastasis = 0, bone_metastases = 8,
+  psa = 45, hemoglobin = 128, albumin = 41, alp = 180, ldh = 210
 )
 
-predict_baseline_risk(patient)
-estimate_treatment_effect(patient)
-plot_treatment_effect(patient)
-treatment_effect_curve("ard")
+predict_baseline_risk(patient)      # linear predictor and 4-year risk
+estimate_treatment_effect(patient)  # ARD, ΔRMST, and HR with 95% CI and PI
+treatment_effect_curve("ard")       # pooled curve across baseline risk
+check_inputs(patient)               # values outside the development data
+model_inputs()                      # inputs, units, accepted values, scoring
 ```
 
-[`model_inputs()`](https://wfukuokaya.github.io/mhspcarpi/reference/model_inputs.md)
-lists the inputs, units, accepted values, and definitions.
-[`check_inputs()`](https://wfukuokaya.github.io/mhspcarpi/reference/check_inputs.md)
-reports values outside the range observed in the trials; their estimates
-are extrapolations. `example_patients` contains 6 synthetic patients
-spanning the range of baseline risk. See
-[`vignette("mhspcarpi")`](https://wfukuokaya.github.io/mhspcarpi/articles/mhspcarpi.md)
-for a walkthrough.
+See
+[`vignette("mhspcarpi")`](https://wfukuokaya.github.io/mhspcarpi/articles/mhspcarpi.md).
 
-## Model specification
+## Model
 
-The model is stored as aggregate parameters in
-`inst/extdata/model_spec.json`: risk-model coefficients and spline
-knots, the 4-year baseline cumulative hazards from the multiply imputed
-datasets, and the pooled treatment-effect curves. No participant-level
-data are included.
+The model (version 261002-raw-rcs) is stored as aggregate parameters in
+`inst/extdata/model_spec.json`, built from the analysis export with
+`data-raw/build_model_spec.R`. Tests compare the package with reference
+profiles scored by the analysis code and with a simulated cohort
+(`data-raw/synthetic_cohort_check.R`); comparison with `rms` predictions
+from the analysis run (`data-raw/remote_golden_cases.R`) is pending.
 
-The specification is generated from the analysis export with
-`data-raw/build_model_spec.R`. Tests check the package against reference
-profiles scored by the analysis code and, when available, against golden
-cases computed with `rms` on the analysis computer
-(`data-raw/remote_golden_cases.R`). `data-raw/synthetic_cohort_check.R`
-runs the analysis export code on a simulated cohort; the tests compare
-the package with `rms` predictions and with the true risks of that
-simulation.
-
-## Updating the model
-
-The analysis runs on a separate computer with the participant-level
-data; this repository receives only its aggregate export.
-
-1.  After the analysis script finishes, run
-    `data-raw/remote_golden_cases.R` in the same R session. It writes
-    `golden_cases.csv` and stops if the exported linear predictor is not
-    aligned with the baseline hazards and effect curves.
-2.  Rebuild the specification:
-    `Rscript data-raw/build_model_spec.R path/to/model_export.txt`.
-3.  Copy `golden_cases.csv` to `tests/testthat/fixtures/` and run the
-    tests.
-4.  Update the version and `NEWS.md`.
-
-## Repository layout
-
-| Path | Contents |
-|----|----|
-| `R/` | Package functions |
-| `inst/extdata/model_spec.json` | Model specification (aggregate parameters) |
-| `data-raw/` | Scripts that build the specification, golden cases, the synthetic-cohort check, and `example_patients` |
-| `tests/testthat/` | Tests, with synthetic fixtures in `fixtures/synthetic/` |
-| `vignettes/` | “Get started” vignette |
-
-## Development
-
-``` r
-
-testthat::test_local()
-lintr::lint_package()
-rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"))
-```
-
-## Data
-
-No participant-level data are included. The model specification contains
-aggregate parameters only, and all test fixtures are simulated.
+To update the model: run `data-raw/remote_golden_cases.R` after the
+analysis script, rebuild the specification with
+`Rscript data-raw/build_model_spec.R path/to/model_export.txt`, add
+`golden_cases.csv` to `tests/testthat/fixtures/`, run the tests, and
+update the version and `NEWS.md`.
 
 ## Citation
 
-`citation("mhspcarpi")` gives the package citation. The article will be
-added on publication.
+`citation("mhspcarpi")`. The article will be added on publication.
