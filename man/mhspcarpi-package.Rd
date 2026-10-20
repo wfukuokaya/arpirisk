@@ -6,7 +6,7 @@
 \alias{mhspcarpi-package}
 \title{mhspcarpi: ARPI Treatment Effects by Baseline Risk in Metastatic Prostate Cancer}
 \description{
-Implements a risk model, developed from individual participant data of 4 placebo-controlled randomized clinical trials, that predicts the 4-year risk of all-cause death with placebo plus androgen deprivation therapy in patients with metastatic hormone-sensitive prostate cancer. The package uses this baseline risk to report pooled estimates of the treatment effects of androgen receptor pathway inhibitors on overall survival: the difference in 4-year survival probability, the restricted mean survival time difference through 4 years, and the hazard ratio. A 'shiny' calculator is included and can be exported as a static 'Shinylive' web application.
+Implements a risk model, developed from individual participant data of 4 placebo-controlled randomized clinical trials, that predicts the 4-year risk of all-cause death with placebo plus androgen deprivation therapy in patients with metastatic hormone-sensitive prostate cancer. The package uses this baseline risk to report pooled estimates of the treatment effects of androgen receptor pathway inhibitors on overall survival: the difference in 4-year survival probability, the restricted mean survival time difference through 4 years, and the hazard ratio.
 }
 \seealso{
 Useful links:

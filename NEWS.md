@@ -1,5 +1,11 @@
 # mhspcarpi (development version)
 
+* The web calculator moved to its own repository,
+  <https://github.com/wfukuokaya/mhspcarpi-app>, which builds it from a pinned
+  commit of this package. `run_app()` and `mhspc_app()` are removed, and shiny,
+  bslib, htmltools, svglite, and shinylive are no longer suggested. The
+  lower-level functions the calculator calls are exported and documented in
+  `?"app-api"`.
 * Web calculator: now runs in Safari and in every browser on an iPhone or iPad
   (all of which use WebKit). R in WebAssembly ran out of stack there while
   building the page, computing the results, and drawing the plot. The page is

@@ -1,3 +1,3 @@
 linters: linters_with_defaults(line_length_linter(120L))
 encoding: "UTF-8"
-exclusions: list("data-raw", "vignettes", "R/app_gradients.R", "R/app_theme.R")
+exclusions: list("data-raw", "vignettes")

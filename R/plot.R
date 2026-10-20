@@ -103,7 +103,7 @@ patient_points <- function(newdata, model, scale) {
 }
 
 # Colors from the JAMA palette (as in ggsci::pal_jama()) on Bootstrap's neutral
-# grays, matching the calculator theme in _brand.yml.
+# grays, matching the web calculator.
 effect_plot_style <- function() {
   list(
     series = "#374E55", # Limed Spruce: the pooled curve and its confidence band
@@ -128,16 +128,6 @@ effect_plot_par <- function() {
     family = "sans",
     xpd = FALSE
   )
-}
-
-# Height of the calculator's effect plot in pixels: a 4:3 shape that follows the
-# card width, kept between 320 and 560 pixels. Before the width is known, the
-# plot is 320 pixels tall.
-effect_plot_height <- function(width) {
-  if (length(width) != 1L || !is.finite(width)) {
-    return(320)
-  }
-  round(min(max(0.75 * width, 320), 560))
 }
 
 # Ticks every 20% when their labels fit the plot width, otherwise every 25% or

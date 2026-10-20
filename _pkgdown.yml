@@ -15,6 +15,3 @@ reference:
       - check_inputs
       - mhspc_model
       - example_patients
-  - title: Calculator
-    contents:
-      - run_app

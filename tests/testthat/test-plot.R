@@ -54,14 +54,6 @@ test_that("axis titles shrink to fit narrow plots", {
   expect_invisible(plot_treatment_effect(example_patient()))
 })
 
-test_that("the calculator's effect plot keeps a 4:3 shape within height limits", {
-  expect_equal(effect_plot_height(600), 450)
-  expect_equal(effect_plot_height(300), 320)
-  expect_equal(effect_plot_height(1200), 560)
-  expect_equal(effect_plot_height(NULL), 320)
-  expect_equal(effect_plot_height(NA), 320)
-})
-
 test_that("percent ticks widen their spacing on narrow plots", {
   grDevices::pdf(NULL)
   on.exit(grDevices::dev.off())
