@@ -58,8 +58,7 @@
 <li>the risk of death within 4 years with placebo plus androgen deprivation therapy (ADT), called baseline risk; and</li>
 <li>the pooled effects of an ARPI plus ADT versus placebo plus ADT at that baseline risk: the difference in the probability of being alive at 4 years, the restricted mean survival time difference through 4 years, and the hazard ratio, each with a 95% confidence interval and a 95% prediction interval.</li>
 </ul>
-<p>The package also contains the web calculator, which runs entirely in the browser as a static Shinylive site: <a href="https://arpi-treatment-effect-estimator.pages.dev/" class="external-link uri">https://arpi-treatment-effect-estimator.pages.dev/</a>.</p>
-<p>For research and education. The calculator is not a medical device.</p>
+<p>For research and education; not a medical device.</p>
 <blockquote>
 <p><strong>Status:</strong> version 0.1.0 accompanies a manuscript under peer review and uses model version 261002-raw-rcs. The package reproduces the reference profiles scored by the analysis code; the check against <code>rms</code> golden cases from the same analysis run (<code>data-raw/remote_golden_cases.R</code>) is pending.</p>
 </blockquote>
@@ -90,21 +89,8 @@
 <span><span class="fu"><a href="reference/predict_baseline_risk.html">predict_baseline_risk</a></span><span class="op">(</span><span class="va">patient</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/estimate_treatment_effect.html">estimate_treatment_effect</a></span><span class="op">(</span><span class="va">patient</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/plot_treatment_effect.html">plot_treatment_effect</a></span><span class="op">(</span><span class="va">patient</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/treatment_effect_curve.html">treatment_effect_curve</a></span><span class="op">(</span><span class="st">"ard"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/run_app.html">run_app</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/treatment_effect_curve.html">treatment_effect_curve</a></span><span class="op">(</span><span class="st">"ard"</span><span class="op">)</span></span></code></pre></div>
 <p><code><a href="reference/model_inputs.html">model_inputs()</a></code> lists the inputs, units, accepted values, and definitions. <code><a href="reference/check_inputs.html">check_inputs()</a></code> reports values outside the range observed in the trials; their estimates are extrapolations. <code>example_patients</code> contains 6 synthetic patients spanning the range of baseline risk. See <code><a href="articles/mhspcarpi.html">vignette("mhspcarpi")</a></code> for a walkthrough.</p>
-</div>
-<div class="section level2">
-<h2 id="web-calculator">Web calculator<a class="anchor" aria-label="anchor" href="#web-calculator"></a>
-</h2>
-<p>The calculator takes the 9 inputs, with unit switches for laboratory values and a definition behind each input, and shows the baseline risk, the expected outcomes for 100 patients, and the treatment effect across baseline risk. A query string fills the inputs (for example <code>?psa=45&amp;hemoglobin=128</code>, in the units listed by <code><a href="reference/model_inputs.html">model_inputs()</a></code>). The coefficients are shown in the “Model specification” panel.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="ex">Rscript</span> tools/build_shinylive.R _site</span></code></pre></div>
-<p>The command exports the calculator, with WebAssembly builds of its R dependencies, to <code>_site/</code> for static hosting. The GitHub Actions workflow in <code>.github/workflows/deploy-app.yaml</code> deploys the site to Cloudflare Pages when a release is published or when it is started by hand; it needs the repository secrets <code>CLOUDFLARE_API_TOKEN</code> and <code>CLOUDFLARE_ACCOUNT_ID</code>.</p>
-<div class="section level3">
-<h3 id="design">Design<a class="anchor" aria-label="anchor" href="#design"></a>
-</h3>
-<p>The visual identity is defined in <code>_brand.yml</code> (brand.yml format: colors, fonts, and links). It follows Quarto’s default HTML output, with the system sans-serif font stack on a white page, and uses the JAMA color palette (as in <code>ggsci::pal_jama()</code>) for controls, the plot, and the header. <code>tools/build_theme.R</code> converts the file into the CSS variables in <code>R/app_theme.R</code>, so the app uses bslib’s precompiled theme and needs no Sass compilation in the browser. The header shows the title in white on one of four layered radial gradients in the darker JAMA colors (<code>inst/app/gradients/</code>), chosen at random on each page load; they were generated with the method described by Justin Jay Wang in “Methods for random gradients” (2024) and inlined by <code>tools/build_gradients.R</code>.</p>
-</div>
 </div>
 <div class="section level2">
 <h2 id="model-specification">Model specification<a class="anchor" aria-label="anchor" href="#model-specification"></a>
@@ -120,7 +106,7 @@
 <li>After the analysis script finishes, run <code>data-raw/remote_golden_cases.R</code> in the same R session. It writes <code>golden_cases.csv</code> and stops if the exported linear predictor is not aligned with the baseline hazards and effect curves.</li>
 <li>Rebuild the specification: <code>Rscript data-raw/build_model_spec.R path/to/model_export.txt</code>.</li>
 <li>Copy <code>golden_cases.csv</code> to <code>tests/testthat/fixtures/</code> and run the tests.</li>
-<li>Update the version and <code>NEWS.md</code>, then rebuild the calculator.</li>
+<li>Update the version and <code>NEWS.md</code>.</li>
 </ol>
 </div>
 <div class="section level2">
@@ -138,24 +124,16 @@
 <tbody>
 <tr>
 <td><code>R/</code></td>
-<td>Package functions and the Shiny calculator</td>
+<td>Package functions</td>
 </tr>
 <tr>
 <td><code>inst/extdata/model_spec.json</code></td>
 <td>Model specification (aggregate parameters)</td>
 </tr>
 <tr>
-<td><code>inst/app/gradients/</code></td>
-<td>Header artwork for the calculator</td>
-</tr>
-<tr>
 <td><code>data-raw/</code></td>
 <td>Scripts that build the specification, golden cases, the synthetic-cohort check, and <code>example_patients</code>
 </td>
-</tr>
-<tr>
-<td><code>tools/</code></td>
-<td>Scripts that build the calculator theme, header artwork, and Shinylive site</td>
 </tr>
 <tr>
 <td><code>tests/testthat/</code></td>
@@ -166,17 +144,13 @@
 <td><code>vignettes/</code></td>
 <td>“Get started” vignette</td>
 </tr>
-<tr>
-<td><code>_brand.yml</code></td>
-<td>Visual identity of the calculator</td>
-</tr>
 </tbody>
 </table>
 </div>
 <div class="section level2">
 <h2 id="development">Development<a class="anchor" aria-label="anchor" href="#development"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_package.html" class="external-link">test_local</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu">lintr</span><span class="fu">::</span><span class="fu">lint_package</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu">rcmdcheck</span><span class="fu">::</span><span class="fu"><a href="http://r-lib.github.io/rcmdcheck/reference/rcmdcheck.html" class="external-link">rcmdcheck</a></span><span class="op">(</span>args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"--no-manual"</span>, <span class="st">"--as-cran"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>

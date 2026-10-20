@@ -17,11 +17,7 @@ For each patient, the package estimates:
   and the hazard ratio, each with a 95% confidence interval and a 95%
   prediction interval.
 
-The package also contains the web calculator, which runs entirely in the
-browser as a static Shinylive site:
-<https://arpi-treatment-effect-estimator.pages.dev/>.
-
-For research and education. The calculator is not a medical device.
+For research and education; not a medical device.
 
 > **Status:** version 0.1.0 accompanies a manuscript under peer review
 > and uses model version 261002-raw-rcs. The package reproduces the
@@ -58,7 +54,6 @@ predict_baseline_risk(patient)
 estimate_treatment_effect(patient)
 plot_treatment_effect(patient)
 treatment_effect_curve("ard")
-run_app()
 ```
 
 [`model_inputs()`](https://wfukuokaya.github.io/mhspcarpi/reference/model_inputs.md)
@@ -69,41 +64,6 @@ are extrapolations. `example_patients` contains 6 synthetic patients
 spanning the range of baseline risk. See
 [`vignette("mhspcarpi")`](https://wfukuokaya.github.io/mhspcarpi/articles/mhspcarpi.md)
 for a walkthrough.
-
-## Web calculator
-
-The calculator takes the 9 inputs, with unit switches for laboratory
-values and a definition behind each input, and shows the baseline risk,
-the expected outcomes for 100 patients, and the treatment effect across
-baseline risk. A query string fills the inputs (for example
-`?psa=45&hemoglobin=128`, in the units listed by
-[`model_inputs()`](https://wfukuokaya.github.io/mhspcarpi/reference/model_inputs.md)).
-The coefficients are shown in the “Model specification” panel.
-
-``` sh
-Rscript tools/build_shinylive.R _site
-```
-
-The command exports the calculator, with WebAssembly builds of its R
-dependencies, to `_site/` for static hosting. The GitHub Actions
-workflow in `.github/workflows/deploy-app.yaml` deploys the site to
-Cloudflare Pages when a release is published or when it is started by
-hand; it needs the repository secrets `CLOUDFLARE_API_TOKEN` and
-`CLOUDFLARE_ACCOUNT_ID`.
-
-### Design
-
-The visual identity is defined in `_brand.yml` (brand.yml format:
-colors, fonts, and links). It follows Quarto’s default HTML output, with
-the system sans-serif font stack on a white page, and uses the JAMA
-color palette (as in `ggsci::pal_jama()`) for controls, the plot, and
-the header. `tools/build_theme.R` converts the file into the CSS
-variables in `R/app_theme.R`, so the app uses bslib’s precompiled theme
-and needs no Sass compilation in the browser. The header shows the title
-in white on one of four layered radial gradients in the darker JAMA
-colors (`inst/app/gradients/`), chosen at random on each page load; they
-were generated with the method described by Justin Jay Wang in “Methods
-for random gradients” (2024) and inlined by `tools/build_gradients.R`.
 
 ## Model specification
 
@@ -135,20 +95,17 @@ data; this repository receives only its aggregate export.
     `Rscript data-raw/build_model_spec.R path/to/model_export.txt`.
 3.  Copy `golden_cases.csv` to `tests/testthat/fixtures/` and run the
     tests.
-4.  Update the version and `NEWS.md`, then rebuild the calculator.
+4.  Update the version and `NEWS.md`.
 
 ## Repository layout
 
 | Path | Contents |
 |----|----|
-| `R/` | Package functions and the Shiny calculator |
+| `R/` | Package functions |
 | `inst/extdata/model_spec.json` | Model specification (aggregate parameters) |
-| `inst/app/gradients/` | Header artwork for the calculator |
 | `data-raw/` | Scripts that build the specification, golden cases, the synthetic-cohort check, and `example_patients` |
-| `tools/` | Scripts that build the calculator theme, header artwork, and Shinylive site |
 | `tests/testthat/` | Tests, with synthetic fixtures in `fixtures/synthetic/` |
 | `vignettes/` | “Get started” vignette |
-| `_brand.yml` | Visual identity of the calculator |
 
 ## Development
 
