@@ -25,9 +25,8 @@ An object of class `mhspc_model`.
 ## Details
 
 The specification contains only aggregate quantities: the risk-model
-coefficients and spline knots, the 4-year baseline cumulative hazards
-from the multiply imputed datasets, and the pooled treatment-effect
-curves.
+coefficients and spline knots, the 4-year baseline cumulative hazards,
+and the pooled treatment-effect curves.
 
 ## Examples
 
@@ -39,5 +38,4 @@ mhspc_model()
 #>   hemoglobin, albumin, alp, and ldh.
 #> • Treatment effects of ARPI plus ADT: survival difference, restricted mean
 #>   survival time difference, and hazard ratio.
-#> • Baseline hazards from 100 imputed datasets.
 ```

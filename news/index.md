@@ -1,20 +1,21 @@
 # Changelog
 
-## mhspcarpi (development version)
+## arpirisk (development version)
 
-- `plot_treatment_effect()` is removed; plotting moved to the web
-  calculator.
-  [`treatment_effect_curve()`](https://wfukuokaya.github.io/mhspcarpi/reference/treatment_effect_curve.md)
-  returns the curves for custom figures. graphics and grDevices are no
+- The package is renamed from mhspcarpi to arpirisk; the repository is
+  <https://github.com/wfukuokaya/arpirisk> and the web calculator
+  <https://github.com/wfukuokaya/arpirisk-app>.
+- `plot_treatment_effect()` and `treatment_effect_curve()` are removed;
+  plotting moved to the web calculator. graphics and grDevices are no
   longer imported.
 - The vignette is written in Quarto, and the README is shorter.
 - The web calculator moved to its own repository,
-  <https://github.com/wfukuokaya/mhspcarpi-app>, which builds it from a
+  <https://github.com/wfukuokaya/arpirisk-app>, which builds it from a
   pinned commit of this package. `run_app()` and `mhspc_app()` are
   removed, and shiny, bslib, htmltools, svglite, and shinylive are no
   longer suggested. The lower-level functions the calculator calls are
   exported and documented in
-  [`?"app-api"`](https://wfukuokaya.github.io/mhspcarpi/reference/app-api.md).
+  [`?"app-api"`](https://wfukuokaya.github.io/arpirisk/reference/app-api.md).
 - Web calculator: now runs in Safari and in every browser on an iPhone
   or iPad (all of which use WebKit). R in WebAssembly ran out of stack
   there while building the page, computing the results, and drawing the
@@ -44,7 +45,7 @@
   “This patient” label is placed above or below the curve, whichever
   keeps it closer to the marker without crossing the curve.
 
-## mhspcarpi 0.1.0
+## arpirisk 0.1.0
 
 - Model version 261002-raw-rcs replaces 260803-raw-rcs. Its
   linear-predictor center matches the baseline hazards, which raises
@@ -63,11 +64,11 @@
   the simulation). The model specification built from the 260803 export
   has this problem; it is fixed in 261002_script.R and checked by
   `data-raw/remote_golden_cases.R`.
-- [`treatment_effect_curve()`](https://wfukuokaya.github.io/mhspcarpi/reference/treatment_effect_curve.md)
-  returns the pooled effect curves for custom figures and tables.
+- `treatment_effect_curve()` returns the pooled effect curves for custom
+  figures and tables.
 - `example_patients` provides 6 synthetic patients spanning the range of
   baseline risk, and
-  [`model_inputs()`](https://wfukuokaya.github.io/mhspcarpi/reference/model_inputs.md)
+  [`model_inputs()`](https://wfukuokaya.github.io/arpirisk/reference/model_inputs.md)
   gains a `definition` column.
 - Calculator: a note for every input on obtaining the value in routine
   care (timing relative to androgen deprivation therapy, conventional

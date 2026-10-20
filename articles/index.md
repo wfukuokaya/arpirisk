@@ -3,4 +3,4 @@
 ### All vignettes
 
 - [Get started with
-  mhspcarpi](https://wfukuokaya.github.io/mhspcarpi/articles/mhspcarpi.md):
+  arpirisk](https://wfukuokaya.github.io/arpirisk/articles/arpirisk.md):

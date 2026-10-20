@@ -1,14 +1,13 @@
 # Building blocks for the web calculator
 
 Lower-level functions used by the web calculator, which is developed in
-a separate repository (<https://github.com/wfukuokaya/mhspcarpi-app>)
-and calls them step by step. They may change between minor versions;
+a separate repository (<https://github.com/wfukuokaya/arpirisk-app>) and
+calls them step by step. They may change between minor versions;
 analyses should use
-[`predict_baseline_risk()`](https://wfukuokaya.github.io/mhspcarpi/reference/predict_baseline_risk.md),
-[`estimate_treatment_effect()`](https://wfukuokaya.github.io/mhspcarpi/reference/estimate_treatment_effect.md),
-[`check_inputs()`](https://wfukuokaya.github.io/mhspcarpi/reference/check_inputs.md),
+[`predict_baseline_risk()`](https://wfukuokaya.github.io/arpirisk/reference/predict_baseline_risk.md),
+[`estimate_treatment_effect()`](https://wfukuokaya.github.io/arpirisk/reference/estimate_treatment_effect.md),
 and
-[`treatment_effect_curve()`](https://wfukuokaya.github.io/mhspcarpi/reference/treatment_effect_curve.md).
+[`check_inputs()`](https://wfukuokaya.github.io/arpirisk/reference/check_inputs.md).
 
 ## Functions
 

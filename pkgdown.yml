@@ -2,8 +2,8 @@ pandoc: 3.8.3
 pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
-  mhspcarpi: mhspcarpi.html
-last_built: 2026-10-20T04:52Z
+  arpirisk: arpirisk.html
+last_built: 2026-10-20T05:05Z
 urls:
-  reference: https://wfukuokaya.github.io/mhspcarpi/reference
-  article: https://wfukuokaya.github.io/mhspcarpi/articles
+  reference: https://wfukuokaya.github.io/arpirisk/reference
+  article: https://wfukuokaya.github.io/arpirisk/articles

@@ -3,7 +3,7 @@
 Six synthetic patients that span the range of baseline risk, for
 examples and tests. They are not trial participants. Values are in the
 model's units (see
-[`model_inputs()`](https://wfukuokaya.github.io/mhspcarpi/reference/model_inputs.md)).
+[`model_inputs()`](https://wfukuokaya.github.io/arpirisk/reference/model_inputs.md)).
 
 ## Usage
 

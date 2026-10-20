@@ -15,7 +15,7 @@ model_inputs(model = mhspc_model())
 - model:
 
   An `mhspc_model` object from
-  [`mhspc_model()`](https://wfukuokaya.github.io/mhspcarpi/reference/mhspc_model.md).
+  [`mhspc_model()`](https://wfukuokaya.github.io/arpirisk/reference/mhspc_model.md).
 
 ## Value
 

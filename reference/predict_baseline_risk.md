@@ -16,7 +16,7 @@ predict_baseline_risk(newdata, model = mhspc_model())
 
   A data frame with one row per patient and one column per input listed
   by
-  [`model_inputs()`](https://wfukuokaya.github.io/mhspcarpi/reference/model_inputs.md):
+  [`model_inputs()`](https://wfukuokaya.github.io/arpirisk/reference/model_inputs.md):
   `ecog_ps` (0, 1, or 2), `gleason_score` (2 to 10),
   `visceral_metastasis` (0 or 1, or logical), `bone_metastases` (a
   count, or a category code `"0-3"`, `"4-6"`, `"7-10"`, or `"11+"`),
@@ -26,7 +26,7 @@ predict_baseline_risk(newdata, model = mhspc_model())
 - model:
 
   An `mhspc_model` object from
-  [`mhspc_model()`](https://wfukuokaya.github.io/mhspcarpi/reference/mhspc_model.md).
+  [`mhspc_model()`](https://wfukuokaya.github.io/arpirisk/reference/mhspc_model.md).
 
 ## Value
 
@@ -56,8 +56,7 @@ A data frame with one row per patient in `newdata`:
 ## Details
 
 The linear predictor is the shrunken, centered Cox linear predictor for
-placebo plus ADT. Risk is averaged over the baseline cumulative hazards
-estimated in the multiply imputed datasets.
+placebo plus ADT.
 
 ## Examples
 
