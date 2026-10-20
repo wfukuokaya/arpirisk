@@ -176,16 +176,6 @@ head(curve)
 #> 6  4.982883
 ```
 
-## The calculator
-
-[`run_app()`](https://wfukuokaya.github.io/mhspcarpi/reference/run_app.md)
-opens the interactive calculator. The same app is exported as a static
-Shinylive site with `tools/build_shinylive.R`, so it runs entirely in
-the browser without a server. The calculator accepts the inputs in its
-query string, for example `?psa=45&hemoglobin=128`, using the column
-names and units listed by
-[`model_inputs()`](https://wfukuokaya.github.io/mhspcarpi/reference/model_inputs.md).
-
 ## Model specification
 
 The model is stored as aggregate parameters in a JSON file installed
