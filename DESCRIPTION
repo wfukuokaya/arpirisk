@@ -11,13 +11,10 @@ Description: Implements a risk model, developed from individual participant
     package uses this baseline risk to report pooled estimates of the treatment
     effects of androgen receptor pathway inhibitors on overall survival: the
     difference in 4-year survival probability, the restricted mean survival
-    time difference through 4 years, and the hazard ratio. A 'shiny'
-    calculator is included and can be exported as a static 'Shinylive' web
-    application.
+    time difference through 4 years, and the hazard ratio.
 License: MIT + file LICENSE
 URL: https://github.com/wfukuokaya/mhspcarpi,
-    https://wfukuokaya.github.io/mhspcarpi/,
-    https://arpi-treatment-effect-estimator.pages.dev/
+    https://wfukuokaya.github.io/mhspcarpi/
 BugReports: https://github.com/wfukuokaya/mhspcarpi/issues
 Encoding: UTF-8
 Language: en-US
