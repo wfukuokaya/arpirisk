@@ -12,3 +12,5 @@
 ^cran-comments\.md$
 ^CRAN-SUBMISSION$
 ^\.DS_Store$
+^vignettes/\.quarto$
+^vignettes/.*_files$

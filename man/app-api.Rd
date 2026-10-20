@@ -12,19 +12,13 @@
 \alias{in_effect_range}
 \alias{effect_at_lp}
 \alias{effect_risk_range}
-\alias{effect_scales}
-\alias{effect_curve}
-\alias{overall_effect}
-\alias{effect_plot_par}
-\alias{draw_effect_plot}
 \title{Building blocks for the web calculator}
 \description{
 Lower-level functions used by the web calculator, which is developed in a
 separate repository (\url{https://github.com/wfukuokaya/mhspcarpi-app}) and
 calls them step by step. They may change between minor versions; analyses
 should use \code{\link[=predict_baseline_risk]{predict_baseline_risk()}}, \code{\link[=estimate_treatment_effect]{estimate_treatment_effect()}},
-\code{\link[=check_inputs]{check_inputs()}}, \code{\link[=plot_treatment_effect]{plot_treatment_effect()}}, and
-\code{\link[=treatment_effect_curve]{treatment_effect_curve()}}.
+\code{\link[=check_inputs]{check_inputs()}}, and \code{\link[=treatment_effect_curve]{treatment_effect_curve()}}.
 }
 \section{Functions}{
 
@@ -39,9 +33,6 @@ one categorical predictor.
 \code{in_effect_range(lp, model)}, \code{effect_at_lp(lp, model, scale)}, and
 \code{effect_risk_range(model)} compute the baseline risk and the treatment
 effects from values on the model's scale.
-\item \code{effect_scales()}, \code{effect_curve(model, scale)},
-\code{overall_effect(model, scale)}, \code{effect_plot_par()}, and
-\code{draw_effect_plot(curve, scale, ...)} draw the treatment-effect plot.
 }
 }
 

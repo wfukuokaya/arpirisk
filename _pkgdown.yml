@@ -8,7 +8,6 @@ reference:
       - predict_baseline_risk
       - estimate_treatment_effect
       - treatment_effect_curve
-      - plot_treatment_effect
   - title: Inputs and model
     contents:
       - model_inputs

@@ -1,8 +1,7 @@
 #' Treatment effects across the range of baseline risk
 #'
 #' Returns the pooled treatment-effect curves on the grid of baseline risk used
-#' in the analysis, for example to draw a custom figure or to tabulate effects.
-#' [plot_treatment_effect()] draws the same curves.
+#' in the analysis, for example to draw a figure or to tabulate effects.
 #'
 #' @inheritParams estimate_treatment_effect
 #'
