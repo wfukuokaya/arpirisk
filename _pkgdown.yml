@@ -10,6 +10,5 @@ reference:
   - title: Inputs and model
     contents:
       - model_inputs
-      - check_inputs
       - mhspc_model
       - example_patients

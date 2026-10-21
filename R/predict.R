@@ -1,94 +1,94 @@
 #' Predict baseline risk of death
 #'
-#' Calculates each patient's predicted risk of death within 4 years with
-#' placebo plus androgen deprivation therapy (ADT). Treatment-effect estimates
-#' are indexed on this baseline risk.
+#' Adds each patient's linear predictor and predicted risk of death within 4
+#' years with androgen deprivation therapy (ADT) alone, called baseline risk.
 #'
-#' The linear predictor is the shrunken, centered Cox linear predictor for
-#' placebo plus ADT.
+#' Inputs are checked first. Missing or invalid values stop with an error that
+#' names the row and input. Values outside the range in the trial data give a
+#' warning, because their estimates are extrapolations. Values above the upper
+#' cap used in model development are scored at the cap, with a message.
 #'
-#' @inheritParams check_inputs
+#' @param newdata A data frame with one row per patient and one column per
+#'   input listed by [model_inputs()]: `ecog_ps` (0, 1, or 2),
+#'   `gleason_score` (2 to 10), `visceral_metastasis` (0 or 1, or logical),
+#'   `bone_metastases` (a count, or a category code `"0-3"`, `"4-6"`,
+#'   `"7-10"`, or `"11+"`), `psa` (ng/mL), `hemoglobin` (g/L), `albumin`
+#'   (g/L), `alp` (U/L), and `ldh` (U/L). Other columns are kept unchanged.
+#' @inheritParams model_inputs
 #'
-#' @return A data frame with one row per patient in `newdata`:
-#'   \describe{
-#'     \item{row}{Row number in `newdata`.}
-#'     \item{linear_predictor}{Linear predictor for placebo plus ADT.}
-#'     \item{baseline_risk}{Predicted 4-year risk of death, as a proportion.}
-#'     \item{in_effect_range}{Whether the baseline risk lies within the range in
-#'       which treatment effects were estimated.}
-#'     \item{notes}{Warnings and notes about the inputs, or `NA`.}
-#'   }
+#' @return `newdata` with two columns added: `linear_predictor`, the model's
+#'   risk score, and `baseline_risk`, the predicted 4-year risk of death as a
+#'   proportion. Existing columns with these names are replaced.
 #' @examples
-#' patient <- data.frame(
-#'   ecog_ps = 0, gleason_score = 9, visceral_metastasis = 0,
-#'   bone_metastases = 8, psa = 45, hemoglobin = 128, albumin = 41,
-#'   alp = 180, ldh = 210
+#' # Your own patient data: one row per patient, one column per input, plus any
+#' # other columns, which are kept.
+#' patients <- data.frame(
+#'   patient_id = c("A", "B"),
+#'   ecog_ps = c(0, 1), gleason_score = c(9, 9), visceral_metastasis = c(0, 0),
+#'   bone_metastases = c(8, 15), psa = c(45, 150), hemoglobin = c(128, 115),
+#'   albumin = c(41, 38), alp = c(180, 420), ldh = c(210, 280)
 #' )
-#' predict_baseline_risk(patient)
+#' risk <- predict_baseline_risk(patients)
+#' risk[c("patient_id", "baseline_risk")]
 #' @export
 predict_baseline_risk <- function(newdata, model = mhspc_model()) {
   check_model(model)
   assessment <- prepare_inputs(newdata, model)
   lp <- linear_predictor(assessment$values, model)
-  data.frame(
-    row = seq_along(lp),
-    linear_predictor = lp,
-    baseline_risk = absolute_risk(lp, model),
-    in_effect_range = in_effect_range(lp, model),
-    notes = combine_notes(row_notes(assessment$issues, length(lp)), lp, model)
-  )
+  newdata$linear_predictor <- lp
+  newdata$baseline_risk <- absolute_risk(lp, model)
+  newdata
 }
 
 #' Estimate treatment effects at a patient's baseline risk
 #'
-#' Returns the pooled treatment effects of an androgen receptor pathway
-#' inhibitor (ARPI) plus ADT versus placebo plus ADT at each patient's baseline
-#' risk. The effects were estimated within each of 4 randomized clinical trials
-#' as smooth functions of baseline risk and pooled with multivariate
-#' random-effects meta-analysis.
+#' Adds each patient's baseline risk and the treatment effects of adding an
+#' androgen receptor pathway inhibitor (ARPI) to androgen deprivation therapy
+#' (ADT) at that risk.
 #'
 #' Positive absolute effects indicate gains with an ARPI. For baseline risks
 #' outside the range in which effects were estimated, the effect at the nearest
-#' edge of that range is returned and `in_effect_range` is `FALSE`.
+#' edge of that range is returned, with a warning. Inputs are checked as in
+#' [predict_baseline_risk()].
 #'
-#' @inheritParams check_inputs
-#' @param scale Effects to return: `"ard"`, the difference in the probability
-#'   of being alive at 4 years; `"rmst"`, the difference in restricted mean
+#' @inheritParams predict_baseline_risk
+#' @param scale Effects to add: `"ard"`, the difference in the probability of
+#'   being alive at 4 years; `"rmst"`, the difference in restricted mean
 #'   survival time through 4 years, in months; `"hr"`, the hazard ratio for
 #'   death.
 #'
-#' @return A data frame with one row per patient and scale: `row`,
-#'   `baseline_risk`, `scale`, `estimate`, the 95% confidence interval
-#'   (`conf_low`, `conf_high`), `pred_low`, `pred_high`, `in_effect_range`,
-#'   and `notes`.
+#' @return `newdata` with `baseline_risk` and, for each scale, the estimate
+#'   in a column named after the scale (for example, `ard`) and its 95%
+#'   confidence interval (`ard_conf_low`, `ard_conf_high`). Existing columns
+#'   with these names are replaced.
 #' @examples
-#' patient <- data.frame(
-#'   ecog_ps = 0, gleason_score = 9, visceral_metastasis = 0,
-#'   bone_metastases = 8, psa = 45, hemoglobin = 128, albumin = 41,
-#'   alp = 180, ldh = 210
-#' )
-#' estimate_treatment_effect(patient)
+#' patients <- example_patients[1:5, ]
+#'
+#' # Difference in the proportion alive at 4 years with an ARPI: 0.16 means 16
+#' # more patients alive per 100 treated
+#' effects <- estimate_treatment_effect(patients, scale = "ard")
+#' effects[c("patient_id", "baseline_risk", "ard", "ard_conf_low", "ard_conf_high")]
+#'
+#' # Additional months alive over 4 years, and the hazard ratio for death
+#' effects <- estimate_treatment_effect(patients, scale = c("rmst", "hr"))
+#' effects[c("patient_id", "rmst", "hr", "hr_conf_low", "hr_conf_high")]
 #' @export
 estimate_treatment_effect <- function(newdata,
                                       scale = c("ard", "rmst", "hr"),
                                       model = mhspc_model()) {
   check_model(model)
-  scale <- match.arg(scale, several.ok = TRUE)
-  risk <- predict_baseline_risk(newdata, model)
-  effects <- purrr::map(scale, function(effect_scale) {
-    data.frame(
-      row = risk$row,
-      baseline_risk = risk$baseline_risk,
-      scale = effect_scale,
-      effect_at_lp(risk$linear_predictor, model, effect_scale),
-      in_effect_range = risk$in_effect_range,
-      notes = risk$notes
-    )
-  }) |>
-    purrr::list_rbind()
-  effects <- effects[order(effects$row, match(effects$scale, scale)), , drop = FALSE]
-  rownames(effects) <- NULL
-  effects
+  scale <- unique(match.arg(scale, several.ok = TRUE))
+  assessment <- prepare_inputs(newdata, model)
+  lp <- linear_predictor(assessment$values, model)
+  warn_outside_effect_range(lp, model)
+  newdata$baseline_risk <- absolute_risk(lp, model)
+  purrr::reduce(scale, function(data, effect_scale) {
+    effects <- effect_at_lp(lp, model, effect_scale)
+    data[[effect_scale]] <- effects$estimate
+    data[[paste0(effect_scale, "_conf_low")]] <- effects$conf_low
+    data[[paste0(effect_scale, "_conf_high")]] <- effects$conf_high
+    data
+  }, .init = newdata)
 }
 
 linear_predictor <- function(values, model, arm = 0) {
@@ -137,19 +137,27 @@ effect_at_lp <- function(lp, model, scale) {
   as.data.frame(values)
 }
 
-combine_notes <- function(notes, lp, model) {
-  outside <- !in_effect_range(lp, model)
-  range_note <- paste0(
-    "Baseline risk is outside the range in which treatment effects were estimated (",
-    paste(format_percent(effect_risk_range(model), 0), collapse = " to "),
-    "); effects are shown at the nearest edge of that range."
+warn_outside_effect_range <- function(lp, model) {
+  outside <- which(!in_effect_range(lp, model))
+  if (length(outside) == 0L) {
+    return(invisible())
+  }
+  # nolint start: object_usage_linter. Used in the cli strings below.
+  n_outside <- length(outside)
+  risk_range <- paste(format_percent(effect_risk_range(model), 0), collapse = " to ")
+  rows <- paste(outside, collapse = ", ")
+  # nolint end
+  cli::cli_warn(
+    c(
+      paste(
+        "{n_outside} patient{?s} {?has/have} a baseline risk outside the range in which",
+        "treatment effects were estimated ({risk_range})."
+      ),
+      i = "Their effects are taken at the nearest edge of that range.",
+      i = "{cli::qty(n_outside)}Row{?s}: {rows}."
+    ),
+    class = "arpirisk_effect_range_warning"
   )
-  notes[outside] <- ifelse(
-    is.na(notes[outside]),
-    range_note,
-    paste(notes[outside], range_note)
-  )
-  notes
 }
 
 effect_risk_range <- function(model) {

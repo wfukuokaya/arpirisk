@@ -29,3 +29,7 @@ modified_spec <- function(modify) {
   jsonlite::write_json(modify(spec), path, auto_unbox = TRUE, digits = NA, null = "null")
   path
 }
+
+# Scores reference data without the warnings and messages about extrapolated or
+# capped values, which these data contain by design.
+quietly <- function(expr) suppressMessages(suppressWarnings(expr))

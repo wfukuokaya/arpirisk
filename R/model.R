@@ -4,10 +4,6 @@
 #' consistent, and returns it as an `mhspc_model` object. The prediction
 #' functions call it by default, so most users never need to call it directly.
 #'
-#' The specification contains only aggregate quantities: the risk-model
-#' coefficients and spline knots, the 4-year baseline cumulative hazards, and
-#' the pooled treatment-effect curves.
-#'
 #' @param path Path to a model specification file. The default, `NULL`, uses
 #'   the specification installed with the package.
 #'
@@ -221,7 +217,7 @@ print.mhspc_model <- function(x, ...) {
   meta <- x$meta # nolint: object_usage_linter. Used in the cli strings below.
   cli::cli_text("{.strong mHSPC ARPI treatment-effect model} ({meta$model_version})")
   cli::cli_bullets(c(
-    "*" = "Baseline risk: {meta$outcome} within {meta$horizon_years} years with {meta$reference_strategy}.",
+    "*" = "Baseline risk: {meta$outcome} within {meta$horizon_years} years with ADT alone.",
     "*" = "Inputs: {.field {names(x$predictors)}}.",
     "*" = paste(
       "Treatment effects of {meta$comparator_strategy}: survival difference,",

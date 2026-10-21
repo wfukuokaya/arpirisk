@@ -4,15 +4,14 @@ test_that("reference profiles scored by the analysis code are reproduced", {
   inputs <- as.data.frame(reference$inputs[names(reference$inputs) != "profile"])
   expected <- reference$expected
 
-  risk <- predict_baseline_risk(inputs)
+  risk <- quietly(predict_baseline_risk(inputs))
   expect_equal(risk$linear_predictor, expected$linear_predictor, tolerance = 1e-8)
   expect_equal(risk$baseline_risk, expected$baseline_risk, tolerance = 1e-8)
 
-  effects <- estimate_treatment_effect(inputs)
-  estimate <- function(scale) effects$estimate[effects$scale == scale]
-  expect_equal(estimate("ard"), expected$ard, tolerance = 1e-8)
-  expect_equal(estimate("rmst"), expected$rmst, tolerance = 1e-8)
-  expect_equal(estimate("hr"), expected$hr, tolerance = 1e-8)
+  effects <- quietly(estimate_treatment_effect(inputs))
+  expect_equal(effects$ard, expected$ard, tolerance = 1e-8)
+  expect_equal(effects$rmst, expected$rmst, tolerance = 1e-8)
+  expect_equal(effects$hr, expected$hr, tolerance = 1e-8)
 })
 
 test_that("baseline risk is a proportion that increases with the linear predictor", {
@@ -23,11 +22,12 @@ test_that("baseline risk is a proportion that increases with the linear predicto
   expect_true(all(diff(risk) > 0))
 })
 
-test_that("predict_baseline_risk returns one row per patient in input order", {
+test_that("predict_baseline_risk adds its results to the patient data", {
   patients <- rbind(example_patient(), low_risk_patient(), example_patient(ecog_ps = 1))
+  patients$patient_id <- c("a", "b", "c")
   risk <- predict_baseline_risk(patients)
-  expect_named(risk, c("row", "linear_predictor", "baseline_risk", "in_effect_range", "notes"))
-  expect_equal(risk$row, 1:3)
+  expect_named(risk, c(names(patients), "linear_predictor", "baseline_risk"))
+  expect_equal(risk[names(patients)], patients)
   single <- predict_baseline_risk(low_risk_patient())
   expect_equal(risk$linear_predictor[[2L]], single$linear_predictor)
   expect_equal(risk$baseline_risk[[2L]], single$baseline_risk)
@@ -54,32 +54,58 @@ test_that("baseline risks outside the effect range use the nearest edge and are 
   expect_equal(effect_at_lp(range[[1L]] - 1, model, "rmst"), effect_at_lp(range[[1L]], model, "rmst"))
   expect_equal(effect_at_lp(range[[2L]] + 1, model, "rmst"), effect_at_lp(range[[2L]], model, "rmst"))
 
-  effects <- estimate_treatment_effect(low_risk_patient(), scale = "ard")
-  expect_false(effects$in_effect_range)
-  expect_match(effects$notes, "outside the range in which treatment effects were estimated")
-  expect_equal(effects$estimate, model$treatment_effects$curves$ard$estimate[[1L]])
+  expect_warning(
+    effects <- estimate_treatment_effect(low_risk_patient(), scale = "ard"),
+    "outside the range in which treatment effects were estimated",
+    class = "arpirisk_effect_range_warning"
+  )
+  expect_equal(effects$ard, model$treatment_effects$curves$ard$estimate[[1L]])
+  expect_no_warning(predict_baseline_risk(low_risk_patient()))
 })
 
-test_that("estimate_treatment_effect returns the requested scales in order", {
-  effects <- estimate_treatment_effect(rbind(example_patient(), example_patient()), scale = c("hr", "ard"))
-  expect_equal(nrow(effects), 4L)
-  expect_equal(effects$scale, c("hr", "ard", "hr", "ard"))
-  expect_equal(effects$row, c(1L, 1L, 2L, 2L))
-  expect_true(all(effects$conf_low <= effects$estimate & effects$estimate <= effects$conf_high))
-  expect_true(all(effects$pred_low <= effects$conf_low & effects$conf_high <= effects$pred_high))
+test_that("estimate_treatment_effect adds the requested scales in order", {
+  patients <- rbind(example_patient(), example_patient(ecog_ps = 1))
+  effects <- estimate_treatment_effect(patients, scale = c("hr", "ard"))
+  expect_named(
+    effects,
+    c(names(patients), "baseline_risk", "hr", "hr_conf_low", "hr_conf_high", "ard", "ard_conf_low", "ard_conf_high")
+  )
+  expect_equal(effects$baseline_risk, predict_baseline_risk(patients)$baseline_risk)
+  expect_true(all(effects$ard_conf_low <= effects$ard & effects$ard <= effects$ard_conf_high))
+  expect_true(all(effects$hr_conf_low <= effects$hr & effects$hr <= effects$hr_conf_high))
+  expect_named(
+    estimate_treatment_effect(example_patient(), scale = c("ard", "ard")),
+    c(names(patients), "baseline_risk", "ard", "ard_conf_low", "ard_conf_high")
+  )
   expect_error(estimate_treatment_effect(example_patient(), scale = "or"), "should be one of")
 })
 
-test_that("values outside the development range trigger one warning and a note", {
-  expect_warning(
-    risk <- predict_baseline_risk(example_patient(hemoglobin = 50)),
-    class = "arpirisk_extrapolation_warning"
-  )
-  expect_match(risk$notes, "extrapolation")
-  expect_true(is.na(predict_baseline_risk(example_patient())$notes))
+test_that("results keep the class of the patient data and replace earlier results", {
+  patients <- tibble::as_tibble(example_patient())
+  risk <- predict_baseline_risk(patients)
+  expect_s3_class(risk, "tbl_df")
+  again <- predict_baseline_risk(risk)
+  expect_equal(again, risk)
+  expect_s3_class(estimate_treatment_effect(patients, scale = "hr"), "tbl_df")
 })
 
-test_that("notes for values above the cap are kept without a warning", {
-  expect_no_warning(risk <- predict_baseline_risk(example_patient(psa = 9000)))
-  expect_match(risk$notes, "scored as")
+test_that("values outside the development range give one warning naming the rows", {
+  patients <- rbind(example_patient(), example_patient(hemoglobin = 50))
+  expect_warning(
+    predict_baseline_risk(patients),
+    "Row 2: Hemoglobin of 50 g/L is outside the range in the trial data",
+    class = "arpirisk_extrapolation_warning"
+  )
+  expect_warning(estimate_treatment_effect(patients, scale = "ard"), class = "arpirisk_extrapolation_warning")
+  expect_no_warning(predict_baseline_risk(example_patient()))
+})
+
+test_that("values above the cap give a message without a warning", {
+  expect_no_warning(
+    expect_message(
+      predict_baseline_risk(example_patient(psa = 9000)),
+      "scored as 8,322 ng/mL",
+      class = "arpirisk_cap_message"
+    )
+  )
 })

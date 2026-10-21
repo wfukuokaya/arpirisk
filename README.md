@@ -6,8 +6,8 @@
 
 Risk-based treatment effects of androgen receptor pathway inhibitors (ARPIs) in metastatic hormone-sensitive prostate cancer (mHSPC), from individual participant data of 4706 patients in LATITUDE, ARCHES, TITAN, and ARASENS.
 
-- **Baseline risk**: 4-year risk of all-cause death with placebo plus androgen deprivation therapy (ADT), from a Cox model stratified by trial with 9 predictors (restricted cubic splines for 5 laboratory values) and uniform shrinkage of the linear predictor.
-- **Treatment effects** of an ARPI plus ADT versus placebo plus ADT, modeled within each trial as smooth functions of the baseline-risk linear predictor and pooled by multivariate random-effects meta-analysis: the 4-year absolute risk difference (ARD), the restricted mean survival time difference through 4 years (ΔRMST), and the hazard ratio (HR), each with a 95% confidence interval.
+- **Baseline risk**: the 4-year risk of all-cause death with androgen deprivation therapy (ADT) alone, from 9 routinely available patient characteristics.
+- **Treatment effects** of adding an ARPI to ADT at that risk: additional patients alive at 4 years, additional months alive over 4 years, and the hazard ratio for death, each with a 95% confidence interval.
 
 For research and education; not a medical device. The web calculator is at <https://github.com/wfukuokaya/arpirisk-app>.
 
@@ -19,26 +19,31 @@ pak::pak("wfukuokaya/arpirisk")
 
 ## Usage
 
+Give a data frame with one row per patient and one column per input (see `model_inputs()`). Each function returns the same data frame with its results added as new columns, so they stay next to each patient.
+
 ```r
 library(arpirisk)
 
-patient <- data.frame(
-  ecog_ps = 0, gleason_score = 9, visceral_metastasis = 0, bone_metastases = 8,
-  psa = 45, hemoglobin = 128, albumin = 41, alp = 180, ldh = 210
+patients <- data.frame(
+  patient_id = c("A", "B"),
+  ecog_ps = c(0, 1), gleason_score = c(9, 9), visceral_metastasis = c(0, 0),
+  bone_metastases = c(8, 15), psa = c(45, 150), hemoglobin = c(128, 115),
+  albumin = c(41, 38), alp = c(180, 420), ldh = c(210, 280)
 )
 
-predict_baseline_risk(patient)      # linear predictor and 4-year risk
-estimate_treatment_effect(patient)  # ARD, ΔRMST, and HR with 95% CI
-check_inputs(patient)               # values outside the development data
-model_inputs()                      # inputs, units, accepted values, scoring
+# 4-year risk of death with ADT alone
+risk <- predict_baseline_risk(patients)
+risk[c("patient_id", "baseline_risk")]
+
+# Difference in the proportion alive at 4 years with an ARPI, with 95% CI
+effects <- estimate_treatment_effect(patients, scale = "ard")
+effects[c("patient_id", "ard", "ard_conf_low", "ard_conf_high")]
 ```
 
-See `vignette("arpirisk")`.
+Risks and absolute risk differences are proportions: an `ard` of 0.16 means 16 more patients alive at 4 years per 100 treated.
 
-## Model
-
-The model (version 261002-raw-rcs) is stored as aggregate parameters in `inst/extdata/model_spec.json`, built from the analysis export by `data-raw/build_model_spec.R`. Tests compare the package against reference profiles and a simulated cohort scored by the analysis code.
+See `vignette("arpirisk")` for a worked example.
 
 ## Citation
 
-`citation("arpirisk")`. The article will be added on publication.
+Methods and model performance are described in our article: `citation("arpirisk")`. The article will be added on publication.

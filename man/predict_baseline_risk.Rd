@@ -12,35 +12,34 @@ input listed by \code{\link[=model_inputs]{model_inputs()}}: \code{ecog_ps} (0, 
 \code{gleason_score} (2 to 10), \code{visceral_metastasis} (0 or 1, or logical),
 \code{bone_metastases} (a count, or a category code \code{"0-3"}, \code{"4-6"},
 \code{"7-10"}, or \code{"11+"}), \code{psa} (ng/mL), \code{hemoglobin} (g/L), \code{albumin}
-(g/L), \code{alp} (U/L), and \code{ldh} (U/L). Other columns are ignored.}
+(g/L), \code{alp} (U/L), and \code{ldh} (U/L). Other columns are kept unchanged.}
 
 \item{model}{An \code{mhspc_model} object from \code{\link[=mhspc_model]{mhspc_model()}}.}
 }
 \value{
-A data frame with one row per patient in \code{newdata}:
-\describe{
-\item{row}{Row number in \code{newdata}.}
-\item{linear_predictor}{Linear predictor for placebo plus ADT.}
-\item{baseline_risk}{Predicted 4-year risk of death, as a proportion.}
-\item{in_effect_range}{Whether the baseline risk lies within the range in
-which treatment effects were estimated.}
-\item{notes}{Warnings and notes about the inputs, or \code{NA}.}
-}
+\code{newdata} with two columns added: \code{linear_predictor}, the model's
+risk score, and \code{baseline_risk}, the predicted 4-year risk of death as a
+proportion. Existing columns with these names are replaced.
 }
 \description{
-Calculates each patient's predicted risk of death within 4 years with
-placebo plus androgen deprivation therapy (ADT). Treatment-effect estimates
-are indexed on this baseline risk.
+Adds each patient's linear predictor and predicted risk of death within 4
+years with androgen deprivation therapy (ADT) alone, called baseline risk.
 }
 \details{
-The linear predictor is the shrunken, centered Cox linear predictor for
-placebo plus ADT.
+Inputs are checked first. Missing or invalid values stop with an error that
+names the row and input. Values outside the range in the trial data give a
+warning, because their estimates are extrapolations. Values above the upper
+cap used in model development are scored at the cap, with a message.
 }
 \examples{
-patient <- data.frame(
-  ecog_ps = 0, gleason_score = 9, visceral_metastasis = 0,
-  bone_metastases = 8, psa = 45, hemoglobin = 128, albumin = 41,
-  alp = 180, ldh = 210
+# Your own patient data: one row per patient, one column per input, plus any
+# other columns, which are kept.
+patients <- data.frame(
+  patient_id = c("A", "B"),
+  ecog_ps = c(0, 1), gleason_score = c(9, 9), visceral_metastasis = c(0, 0),
+  bone_metastases = c(8, 15), psa = c(45, 150), hemoglobin = c(128, 115),
+  albumin = c(41, 38), alp = c(180, 420), ldh = c(210, 280)
 )
-predict_baseline_risk(patient)
+risk <- predict_baseline_risk(patients)
+risk[c("patient_id", "baseline_risk")]
 }

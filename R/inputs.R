@@ -26,51 +26,28 @@ model_inputs <- function(model = mhspc_model()) {
     purrr::list_rbind()
 }
 
-#' Check patient data before prediction
-#'
-#' Checks that `newdata` contains every model input with an accepted value.
-#' Invalid or missing values stop with an error that names the row and input.
-#' Values outside the range observed in the trials, and values above the upper
-#' cap used in model development, are returned as warnings and notes.
-#'
-#' @param newdata A data frame with one row per patient and one column per
-#'   input listed by [model_inputs()]: `ecog_ps` (0, 1, or 2),
-#'   `gleason_score` (2 to 10), `visceral_metastasis` (0 or 1, or logical),
-#'   `bone_metastases` (a count, or a category code `"0-3"`, `"4-6"`,
-#'   `"7-10"`, or `"11+"`), `psa` (ng/mL), `hemoglobin` (g/L), `albumin`
-#'   (g/L), `alp` (U/L), and `ldh` (U/L). Other columns are ignored.
-#' @inheritParams model_inputs
-#'
-#' @return A data frame of warnings and notes with columns `row`, `input`,
-#'   `severity`, and `message`; it has no rows when every value is within the
-#'   development range.
-#' @examples
-#' patient <- data.frame(
-#'   ecog_ps = 0, gleason_score = 9, visceral_metastasis = 0,
-#'   bone_metastases = 8, psa = 45, hemoglobin = 128, albumin = 41,
-#'   alp = 180, ldh = 210
-#' )
-#' check_inputs(patient)
-#' @export
-check_inputs <- function(newdata, model = mhspc_model()) {
-  check_model(model)
-  assessment <- assess_inputs(newdata, model)
-  abort_on_input_errors(assessment$issues, model)
-  issues <- assessment$issues[assessment$issues$severity != "error", , drop = FALSE]
-  issues[c("row", "input", "severity", "message")]
-}
-
+# Checks the inputs as predict_baseline_risk() and estimate_treatment_effect()
+# use them: errors stop, values outside the trial data warn, and capped values
+# are reported in a message.
 prepare_inputs <- function(newdata, model, call = rlang::caller_env()) {
   assessment <- assess_inputs(newdata, model, call = call)
-  abort_on_input_errors(assessment$issues, model, call = call)
-  warnings <- assessment$issues[assessment$issues$severity == "warning", , drop = FALSE]
+  issues <- assessment$issues
+  abort_on_input_errors(issues, model, call = call)
+  warnings <- issues[issues$severity == "warning", , drop = FALSE]
   if (nrow(warnings) > 0L) {
     cli::cli_warn(
       c(
-        "{length(unique(warnings$row))} patient{?s} {?has/have} values outside the range in the trial data.",
-        i = "Their estimates are extrapolations; see the {.field notes} column."
+        "Some values are outside the range in the trial data; their estimates are extrapolations.",
+        row_bullets(warnings, "!")
       ),
       class = "arpirisk_extrapolation_warning"
+    )
+  }
+  notes <- issues[issues$severity == "note", , drop = FALSE]
+  if (nrow(notes) > 0L) {
+    cli::cli_inform(
+      c("Some values are above the upper cap used in model development.", row_bullets(notes, "i")),
+      class = "arpirisk_cap_message"
     )
   }
   assessment
@@ -272,27 +249,24 @@ abort_on_input_errors <- function(issues, model, call = rlang::caller_env()) {
   if (nrow(errors) == 0L) {
     return(invisible())
   }
-  shown <- utils::head(errors, 8L)
-  bullets <- rlang::set_names(
-    paste0("Row ", shown$row, ": ", shown$message),
-    rep("x", nrow(shown))
-  )
-  if (nrow(errors) > nrow(shown)) {
-    bullets <- c(bullets, i = paste0("And ", nrow(errors) - nrow(shown), " more problem(s)."))
-  }
   cli::cli_abort(
-    c("{.arg newdata} has invalid or missing values.", bullets),
+    c("{.arg newdata} has invalid or missing values.", row_bullets(errors, "x")),
     class = "arpirisk_input_error",
     call = call
   )
 }
 
-row_notes <- function(issues, n_rows) {
-  shown <- issues[issues$severity %in% c("warning", "note"), , drop = FALSE]
-  purrr::map_chr(seq_len(n_rows), function(row) {
-    messages <- shown$message[shown$row == row]
-    if (length(messages) == 0L) NA_character_ else paste(messages, collapse = " ")
-  })
+# One bullet per issue, naming the row in `newdata`; long lists are cut short.
+row_bullets <- function(issues, symbol, max_shown = 8L) {
+  shown <- utils::head(issues, max_shown)
+  bullets <- rlang::set_names(
+    paste0("Row ", shown$row, ": ", shown$message),
+    rep(symbol, nrow(shown))
+  )
+  if (nrow(issues) > max_shown) {
+    bullets <- c(bullets, i = paste0("And ", nrow(issues) - max_shown, " more."))
+  }
+  bullets
 }
 
 # --- Messages ----------------------------------------------------------------

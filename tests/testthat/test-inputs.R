@@ -23,17 +23,15 @@ test_that("alternative units convert to the model's units", {
   )
 })
 
-test_that("valid patients pass with no warnings or notes", {
-  issues <- check_inputs(example_patient())
-  expect_equal(nrow(issues), 0L)
-  expect_named(issues, c("row", "input", "severity", "message"))
+test_that("valid patients pass with no warnings or messages", {
+  expect_no_warning(expect_no_message(predict_baseline_risk(example_patient())))
 })
 
 test_that("structural problems stop with informative errors", {
-  expect_error(check_inputs(list(psa = 1)), class = "arpirisk_input_error")
-  expect_error(check_inputs(example_patient()[0, ]), class = "arpirisk_input_error")
+  expect_error(predict_baseline_risk(list(psa = 1)), class = "arpirisk_input_error")
+  expect_error(predict_baseline_risk(example_patient()[0, ]), class = "arpirisk_input_error")
   expect_error(
-    check_inputs(example_patient()[, -1]),
+    predict_baseline_risk(example_patient()[, -1]),
     "missing required column",
     class = "arpirisk_input_error"
   )
@@ -41,7 +39,7 @@ test_that("structural problems stop with informative errors", {
 
 test_that("missing and invalid values stop with row-level errors", {
   expect_input_error <- function(..., pattern) {
-    expect_error(check_inputs(example_patient(...)), pattern, class = "arpirisk_input_error")
+    expect_error(predict_baseline_risk(example_patient(...)), pattern, class = "arpirisk_input_error")
   }
   expect_input_error(psa = NA, pattern = "Prostate-specific antigen is missing")
   expect_input_error(psa = "high", pattern = "must be a number")
@@ -62,11 +60,11 @@ test_that("missing and invalid values stop with row-level errors", {
 test_that("only the first 8 errors are listed", {
   patients <- example_patient()[rep(1L, 10L), ]
   patients$psa <- NA
-  expect_error(check_inputs(patients), "And 2 more", class = "arpirisk_input_error")
+  expect_error(predict_baseline_risk(patients), "And 2 more", class = "arpirisk_input_error")
 })
 
-test_that("values outside the development range or above the cap are reported", {
-  issues <- check_inputs(example_patient(hemoglobin = 50, psa = 9000, bone_metastases = 60))
+test_that("values outside the development range or above the cap are reported by row", {
+  issues <- assess_inputs(example_patient(hemoglobin = 50, psa = 9000, bone_metastases = 60), mhspc_model())$issues
   expect_equal(issues$input, c("bone_metastases", "psa", "hemoglobin"))
   expect_equal(issues$severity, c("warning", "note", "warning"))
   expect_match(issues$message[[2L]], "scored as 8,322 ng/mL")
@@ -74,7 +72,7 @@ test_that("values outside the development range or above the cap are reported", 
 })
 
 test_that("equivalent encodings give the same linear predictor", {
-  lp <- function(...) predict_baseline_risk(example_patient(...))$linear_predictor
+  lp <- function(...) quietly(predict_baseline_risk(example_patient(...)))$linear_predictor
   expect_equal(lp(bone_metastases = "7-10"), lp(bone_metastases = 8))
   expect_equal(lp(bone_metastases = factor("7-10")), lp(bone_metastases = 10))
   expect_equal(lp(bone_metastases = "\u226511"), lp(bone_metastases = 11))

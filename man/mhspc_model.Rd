@@ -18,11 +18,6 @@ An object of class \code{mhspc_model}.
 consistent, and returns it as an \code{mhspc_model} object. The prediction
 functions call it by default, so most users never need to call it directly.
 }
-\details{
-The specification contains only aggregate quantities: the risk-model
-coefficients and spline knots, the 4-year baseline cumulative hazards, and
-the pooled treatment-effect curves.
-}
 \examples{
 mhspc_model()
 }

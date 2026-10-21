@@ -16,38 +16,41 @@ input listed by \code{\link[=model_inputs]{model_inputs()}}: \code{ecog_ps} (0, 
 \code{gleason_score} (2 to 10), \code{visceral_metastasis} (0 or 1, or logical),
 \code{bone_metastases} (a count, or a category code \code{"0-3"}, \code{"4-6"},
 \code{"7-10"}, or \code{"11+"}), \code{psa} (ng/mL), \code{hemoglobin} (g/L), \code{albumin}
-(g/L), \code{alp} (U/L), and \code{ldh} (U/L). Other columns are ignored.}
+(g/L), \code{alp} (U/L), and \code{ldh} (U/L). Other columns are kept unchanged.}
 
-\item{scale}{Effects to return: \code{"ard"}, the difference in the probability
-of being alive at 4 years; \code{"rmst"}, the difference in restricted mean
+\item{scale}{Effects to add: \code{"ard"}, the difference in the probability of
+being alive at 4 years; \code{"rmst"}, the difference in restricted mean
 survival time through 4 years, in months; \code{"hr"}, the hazard ratio for
 death.}
 
 \item{model}{An \code{mhspc_model} object from \code{\link[=mhspc_model]{mhspc_model()}}.}
 }
 \value{
-A data frame with one row per patient and scale: \code{row},
-\code{baseline_risk}, \code{scale}, \code{estimate}, the 95\% confidence interval
-(\code{conf_low}, \code{conf_high}), \code{pred_low}, \code{pred_high}, \code{in_effect_range},
-and \code{notes}.
+\code{newdata} with \code{baseline_risk} and, for each scale, the estimate
+in a column named after the scale (for example, \code{ard}) and its 95\%
+confidence interval (\code{ard_conf_low}, \code{ard_conf_high}). Existing columns
+with these names are replaced.
 }
 \description{
-Returns the pooled treatment effects of an androgen receptor pathway
-inhibitor (ARPI) plus ADT versus placebo plus ADT at each patient's baseline
-risk. The effects were estimated within each of 4 randomized clinical trials
-as smooth functions of baseline risk and pooled with multivariate
-random-effects meta-analysis.
+Adds each patient's baseline risk and the treatment effects of adding an
+androgen receptor pathway inhibitor (ARPI) to androgen deprivation therapy
+(ADT) at that risk.
 }
 \details{
 Positive absolute effects indicate gains with an ARPI. For baseline risks
 outside the range in which effects were estimated, the effect at the nearest
-edge of that range is returned and \code{in_effect_range} is \code{FALSE}.
+edge of that range is returned, with a warning. Inputs are checked as in
+\code{\link[=predict_baseline_risk]{predict_baseline_risk()}}.
 }
 \examples{
-patient <- data.frame(
-  ecog_ps = 0, gleason_score = 9, visceral_metastasis = 0,
-  bone_metastases = 8, psa = 45, hemoglobin = 128, albumin = 41,
-  alp = 180, ldh = 210
-)
-estimate_treatment_effect(patient)
+patients <- example_patients[1:5, ]
+
+# Difference in the proportion alive at 4 years with an ARPI: 0.16 means 16
+# more patients alive per 100 treated
+effects <- estimate_treatment_effect(patients, scale = "ard")
+effects[c("patient_id", "baseline_risk", "ard", "ard_conf_low", "ard_conf_high")]
+
+# Additional months alive over 4 years, and the hazard ratio for death
+effects <- estimate_treatment_effect(patients, scale = c("rmst", "hr"))
+effects[c("patient_id", "rmst", "hr", "hr_conf_low", "hr_conf_high")]
 }

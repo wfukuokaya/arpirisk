@@ -3,8 +3,7 @@
 #' Lower-level functions used by the web calculator, which is developed in a
 #' separate repository (<https://github.com/wfukuokaya/arpirisk-app>) and
 #' calls them step by step. They may change between minor versions; analyses
-#' should use [predict_baseline_risk()], [estimate_treatment_effect()], and
-#' [check_inputs()].
+#' should use [predict_baseline_risk()] and [estimate_treatment_effect()].
 #'
 #' @section Functions:
 #' - `check_model(model)` validates a model specification.

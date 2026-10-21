@@ -4,14 +4,13 @@ Version: 0.1.0
 Authors@R:
     person("Wataru", "Fukuokaya", email = "wfukuokaya@gmail.com",
            role = c("aut", "cre"))
-Description: Implements a risk model, developed from individual participant
-    data of 4 placebo-controlled randomized clinical trials, that predicts the
-    4-year risk of all-cause death with placebo plus androgen deprivation
-    therapy in patients with metastatic hormone-sensitive prostate cancer. The
-    package uses this baseline risk to report pooled estimates of the treatment
-    effects of androgen receptor pathway inhibitors on overall survival: the
-    difference in 4-year survival probability, the restricted mean survival
-    time difference through 4 years, and the hazard ratio.
+Description: Predicts the 4-year risk of all-cause death with androgen
+    deprivation therapy alone in patients with metastatic hormone-sensitive
+    prostate cancer, and estimates the treatment effects on overall survival of
+    adding an androgen receptor pathway inhibitor at that risk: the difference
+    in 4-year survival probability, the restricted mean survival time
+    difference through 4 years, and the hazard ratio. The model was developed
+    from individual participant data of 4 randomized clinical trials.
 License: MIT + file LICENSE
 URL: https://github.com/wfukuokaya/arpirisk,
     https://wfukuokaya.github.io/arpirisk/
@@ -30,10 +29,12 @@ Imports:
     utils
 Suggests:
     covr,
+    dplyr,
     Hmisc,
     knitr,
     quarto,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    tibble
 VignetteBuilder: quarto
 Config/testthat/edition: 3
 Roxygen: list(markdown = TRUE)

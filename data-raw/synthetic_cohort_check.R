@@ -456,7 +456,7 @@ placebo_inputs <- mice::complete(mids_raw, action = 1L) |>
   )
 placebo_risk <- suppressWarnings(predict_baseline_risk(as.data.frame(placebo_inputs), model))
 effect_difference <- function(scale) {
-  max(abs(golden_effects$estimate[golden_effects$scale == scale] - golden[[paste0(scale, "_estimate")]]))
+  max(abs(golden_effects[[scale]] - golden[[paste0(scale, "_estimate")]]))
 }
 
 writeLines(c(

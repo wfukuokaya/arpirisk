@@ -10,53 +10,73 @@ knitr:
     comment: "#>"
 ---
 
-arpirisk predicts the 4-year risk of all-cause death with placebo plus androgen deprivation therapy (ADT), called baseline risk, in metastatic hormone-sensitive prostate cancer (mHSPC), and returns the pooled treatment effects of an androgen receptor pathway inhibitor (ARPI) plus ADT at that baseline risk.
+arpirisk predicts the 4-year risk of all-cause death with androgen deprivation therapy (ADT) alone, called baseline risk, in metastatic hormone-sensitive prostate cancer (mHSPC), and estimates the treatment effects of adding an androgen receptor pathway inhibitor (ARPI) at that baseline risk. Both prediction functions take a data frame with one row per patient and return it with the results added as new columns.
 
 ```{r}
+#| message: false
 library(arpirisk)
+library(dplyr)
 ```
 
 ## Inputs
 
-`model_inputs()` lists the 9 predictors with their column names, units, accepted values, and scoring. `example_patients` contains 6 synthetic patients spanning the range of baseline risk.
+`model_inputs()` lists the 9 inputs with their column names, units, and accepted values. `example_patients` contains 6 synthetic patients spanning the range of baseline risk.
 
 ```{r}
-model_inputs()[c("name", "unit", "accepted", "scoring")]
-example_patients
+model_inputs() |>
+  select(name, unit, accepted)
+
+patients <- as_tibble(example_patients)
+patients
 ```
 
 ## Baseline risk
 
-`predict_baseline_risk()` returns the shrunken, centered linear predictor and the 4-year risk. The `notes` column flags values outside the development data and baseline risks outside the range in which treatment effects were estimated.
+`predict_baseline_risk()` adds the linear predictor and the 4-year baseline risk to the patient data.
 
 ```{r}
-predict_baseline_risk(example_patients)
+patients |>
+  predict_baseline_risk() |>
+  select(patient_id, linear_predictor, baseline_risk)
 ```
 
 ## Treatment effects
 
-`estimate_treatment_effect()` returns, in long format, the absolute risk difference at 4 years (`ard`), the restricted mean survival time difference through 4 years in months (`rmst`), and the hazard ratio (`hr`), each with a 95% confidence interval (`conf_low`, `conf_high`).
+`estimate_treatment_effect()` adds the baseline risk and, for each requested scale, the estimate with its 95% confidence interval: the difference in the proportion of patients alive at 4 years (`ard`), the difference in restricted mean survival time through 4 years in months (`rmst`), and the hazard ratio for death (`hr`). A warning names the patients whose baseline risk lies outside the range in which effects were estimated; their effects are taken at the nearest edge of that range.
 
 ```{r}
-effects <- estimate_treatment_effect(example_patients)
-effects[effects$row == 3, c("scale", "estimate", "conf_low", "conf_high")]
+effects <- patients |>
+  estimate_treatment_effect()
+effects |>
+  select(patient_id, baseline_risk, starts_with(c("ard", "rmst")))
 ```
 
-## Checking inputs
+For reporting, express the risk and the absolute risk difference per 100 patients.
 
-`check_inputs()` stops with an informative error for missing or impossible values and returns warnings and notes for values outside the development data.
+```{r}
+effects |>
+  mutate(across(c(baseline_risk, starts_with("ard")), \(x) round(100 * x))) |>
+  select(patient_id, baseline_risk, ard, ard_conf_low, ard_conf_high, hr)
+```
+
+## Input checks
+
+Both functions check the inputs before predicting. Missing or impossible values stop with an error that names the row and input.
 
 ```{r}
 #| error: true
-patient <- example_patients[1, ]
-patient$hemoglobin <- -1
-check_inputs(patient)
+patients |>
+  mutate(hemoglobin = if_else(patient_id == "P1", -1, hemoglobin)) |>
+  predict_baseline_risk()
 ```
 
+Values outside the range in the trial data give a warning, because their estimates are extrapolations.
+
 ```{r}
-patient$hemoglobin <- 150
-patient$psa <- 20000
-check_inputs(patient)
+patients |>
+  mutate(hemoglobin = if_else(patient_id == "P2", 50, hemoglobin)) |>
+  predict_baseline_risk() |>
+  select(patient_id, hemoglobin, baseline_risk)
 ```
 
 ## Model specification
