@@ -13,3 +13,5 @@ CRAN-SUBMISSION
 vignettes/.quarto/
 vignettes/*_files/
 vignettes/*.html
+tests/testthat/_problems/
+tests/testthat/testthat-problems.rds

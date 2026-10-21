@@ -14,3 +14,5 @@
 ^\.DS_Store$
 ^vignettes/\.quarto$
 ^vignettes/.*_files$
+^tests/testthat/_problems$
+^tests/testthat/testthat-problems\.rds$
