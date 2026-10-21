@@ -37,11 +37,10 @@
 <h2 class="pkg-version" data-toc-text="0.1.0" id="arpirisk-010">arpirisk 0.1.0<a class="anchor" aria-label="anchor" href="#arpirisk-010"></a></h2>
 <ul><li>Initial release.</li>
 <li>
-<code><a href="../reference/predict_baseline_risk.html">predict_baseline_risk()</a></code> predicts the 4-year risk of all-cause death with placebo plus androgen deprivation therapy (ADT) for patients with metastatic hormone-sensitive prostate cancer, from a Cox model with 9 predictors (model version 261002-raw-rcs).</li>
+<code><a href="../reference/predict_baseline_risk.html">predict_baseline_risk()</a></code> adds to a data frame of patients each patient’s linear predictor and predicted 4-year risk of all-cause death with androgen deprivation therapy (ADT) alone, from a Cox model with 9 predictors (model version 261002-raw-rcs).</li>
 <li>
-<code><a href="../reference/estimate_treatment_effect.html">estimate_treatment_effect()</a></code> returns the pooled treatment effects of an androgen receptor pathway inhibitor (ARPI) plus ADT at a patient’s baseline risk: the 4-year absolute risk difference, the restricted mean survival time difference through 4 years, and the hazard ratio, each with a 95% confidence interval.</li>
-<li>
-<code><a href="../reference/check_inputs.html">check_inputs()</a></code> stops for missing or impossible values and flags values outside the development data; <code><a href="../reference/model_inputs.html">model_inputs()</a></code> lists the predictors with their units, accepted values, and scoring; <code><a href="../reference/mhspc_model.html">mhspc_model()</a></code> loads the model specification.</li>
+<code><a href="../reference/estimate_treatment_effect.html">estimate_treatment_effect()</a></code> adds the baseline risk and the treatment effects of adding an androgen receptor pathway inhibitor (ARPI) to ADT at that risk: the 4-year absolute risk difference, the restricted mean survival time difference through 4 years, and the hazard ratio, each with a 95% confidence interval.</li>
+<li>Both functions check the inputs: missing or impossible values stop with an error naming the row and input, and values outside the trial data give a warning. <code><a href="../reference/model_inputs.html">model_inputs()</a></code> lists the inputs with their units and accepted values; <code><a href="../reference/mhspc_model.html">mhspc_model()</a></code> loads the model specification.</li>
 <li>
 <code>example_patients</code> provides 6 synthetic patients spanning the range of baseline risk.</li>
 <li>The lower-level functions used by the web calculator (<a href="https://github.com/wfukuokaya/arpirisk-app" class="external-link uri">https://github.com/wfukuokaya/arpirisk-app</a>) are documented in <code><a href="../reference/app-api.html">?"app-api"</a></code>.</li>

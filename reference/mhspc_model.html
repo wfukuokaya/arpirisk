@@ -62,18 +62,12 @@ the specification installed with the package.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>An object of class <code>mhspc_model</code>.</p>
     </div>
-    <div class="section level2">
-    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The specification contains only aggregate quantities: the risk-model
-coefficients and spline knots, the 4-year baseline cumulative hazards, and
-the pooled treatment-effect curves.</p>
-    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">mhspc_model</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">mHSPC ARPI treatment-effect model</span> (261002-raw-rcs)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Baseline risk: All-cause death within 4 years with Placebo plus ADT.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Baseline risk: All-cause death within 4 years with ADT alone.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Inputs: <span style="color: #00BB00;">ecog_ps</span>, <span style="color: #00BB00;">gleason_score</span>, <span style="color: #00BB00;">visceral_metastasis</span>, <span style="color: #00BB00;">bone_metastases</span>, <span style="color: #00BB00;">psa</span>,</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   <span style="color: #00BB00;">hemoglobin</span>, <span style="color: #00BB00;">albumin</span>, <span style="color: #00BB00;">alp</span>, and <span style="color: #00BB00;">ldh</span>.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Treatment effects of ARPI plus ADT: survival difference, restricted mean</span>

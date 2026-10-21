@@ -22,18 +22,12 @@ mhspc_model(path = NULL)
 
 An object of class `mhspc_model`.
 
-## Details
-
-The specification contains only aggregate quantities: the risk-model
-coefficients and spline knots, the 4-year baseline cumulative hazards,
-and the pooled treatment-effect curves.
-
 ## Examples
 
 ``` r
 mhspc_model()
 #> mHSPC ARPI treatment-effect model (261002-raw-rcs)
-#> • Baseline risk: All-cause death within 4 years with Placebo plus ADT.
+#> • Baseline risk: All-cause death within 4 years with ADT alone.
 #> • Inputs: ecog_ps, gleason_score, visceral_metastasis, bone_metastases, psa,
 #>   hemoglobin, albumin, alp, and ldh.
 #> • Treatment effects of ARPI plus ADT: survival difference, restricted mean

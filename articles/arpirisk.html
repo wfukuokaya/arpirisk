@@ -63,17 +63,19 @@
 
 
 
-    <p>arpirisk predicts the 4-year risk of all-cause death with placebo plus androgen deprivation therapy (ADT), called baseline risk, in metastatic hormone-sensitive prostate cancer (mHSPC), and returns the pooled treatment effects of an androgen receptor pathway inhibitor (ARPI) plus ADT at that baseline risk.</p>
+    <p>arpirisk predicts the 4-year risk of all-cause death with androgen deprivation therapy (ADT) alone, called baseline risk, in metastatic hormone-sensitive prostate cancer (mHSPC), and estimates the treatment effects of adding an androgen receptor pathway inhibitor (ARPI) at that baseline risk. Both prediction functions take a data frame with one row per patient and return it with the results added as new columns.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/wfukuokaya/arpirisk" class="external-link">arpirisk</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/wfukuokaya/arpirisk" class="external-link">arpirisk</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <section class="level2"><h2 id="inputs">Inputs<a class="anchor" aria-label="anchor" href="#inputs"></a>
 </h2>
-<p><code><a href="../reference/model_inputs.html">model_inputs()</a></code> lists the 9 predictors with their column names, units, accepted values, and scoring. <code>example_patients</code> contains 6 synthetic patients spanning the range of baseline risk.</p>
+<p><code><a href="../reference/model_inputs.html">model_inputs()</a></code> lists the 9 inputs with their column names, units, and accepted values. <code>example_patients</code> contains 6 synthetic patients spanning the range of baseline risk.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/model_inputs.html">model_inputs</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"name"</span>, <span class="st">"unit"</span>, <span class="st">"accepted"</span>, <span class="st">"scoring"</span><span class="op">)</span><span class="op">]</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/model_inputs.html">model_inputs</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">name</span>, <span class="va">unit</span>, <span class="va">accepted</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                  name  unit                                            accepted</span></span>
 <span><span class="co">#&gt; 1             ecog_ps  &lt;NA&gt;                                             0, 1, 2</span></span>
 <span><span class="co">#&gt; 2       gleason_score  &lt;NA&gt;                          2, 3, 4, 5, 6, 7, 8, 9, 10</span></span>
@@ -84,94 +86,118 @@
 <span><span class="co">#&gt; 7             albumin   g/L                                            10 to 70</span></span>
 <span><span class="co">#&gt; 8                 alp   U/L                                         0 to 10,000</span></span>
 <span><span class="co">#&gt; 9                 ldh   U/L                                         0 to 10,000</span></span>
-<span><span class="co">#&gt;                                                                                 scoring</span></span>
-<span><span class="co">#&gt; 1                                                                           0 vs 1 or 2</span></span>
-<span><span class="co">#&gt; 2                                                                         ≤8 vs 9 or 10</span></span>
-<span><span class="co">#&gt; 3                                                             Absent (0) or present (1)</span></span>
-<span><span class="co">#&gt; 4                                                        Categories 0–3, 4–6, 7–10, ≥11</span></span>
-<span><span class="co">#&gt; 5 Restricted cubic spline; trial data 0 to 19,000; values above 8,322 scored at the cap</span></span>
-<span><span class="co">#&gt; 6                                         Restricted cubic spline; trial data 57 to 186</span></span>
-<span><span class="co">#&gt; 7                                        Restricted cubic spline; trial data 24 to 61.5</span></span>
-<span><span class="co">#&gt; 8 Restricted cubic spline; trial data 26 to 7,680; values above 4,824 scored at the cap</span></span>
-<span><span class="co">#&gt; 9 Restricted cubic spline; trial data 67 to 4,124; values above 1,470 scored at the cap</span></span>
-<span><span class="va">example_patients</span></span>
-<span><span class="co">#&gt;   patient_id ecog_ps gleason_score visceral_metastasis bone_metastases psa</span></span>
-<span><span class="co">#&gt; 1         P1       0             7                   0               0   5</span></span>
-<span><span class="co">#&gt; 2         P2       0             8                   0               2  12</span></span>
-<span><span class="co">#&gt; 3         P3       0             9                   0               8  45</span></span>
-<span><span class="co">#&gt; 4         P4       1             9                   0              15 150</span></span>
-<span><span class="co">#&gt; 5         P5       1             8                   1               5  30</span></span>
-<span><span class="co">#&gt; 6         P6       2            10                   1              30 800</span></span>
-<span><span class="co">#&gt;   hemoglobin albumin alp ldh</span></span>
-<span><span class="co">#&gt; 1        150      46  70 160</span></span>
-<span><span class="co">#&gt; 2        142      44  80 170</span></span>
-<span><span class="co">#&gt; 3        128      41 180 210</span></span>
-<span><span class="co">#&gt; 4        115      38 420 280</span></span>
-<span><span class="co">#&gt; 5        120      36 150 320</span></span>
-<span><span class="co">#&gt; 6        105      34 500 350</span></span></code></pre></div>
+<span></span>
+<span><span class="va">patients</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="va">example_patients</span><span class="op">)</span></span>
+<span><span class="va">patients</span></span>
+<span><span class="co">#&gt; # A tibble: 6 × 10</span></span>
+<span><span class="co">#&gt;   patient_id ecog_ps gleason_score visceral_metastasis bone_metastases   psa</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;        &lt;dbl&gt;         &lt;dbl&gt;               &lt;dbl&gt;           &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 P1               0             7                   0               0     5</span></span>
+<span><span class="co">#&gt; 2 P2               0             8                   0               2    12</span></span>
+<span><span class="co">#&gt; 3 P3               0             9                   0               8    45</span></span>
+<span><span class="co">#&gt; 4 P4               1             9                   0              15   150</span></span>
+<span><span class="co">#&gt; 5 P5               1             8                   1               5    30</span></span>
+<span><span class="co">#&gt; 6 P6               2            10                   1              30   800</span></span>
+<span><span class="co">#&gt; # ℹ 4 more variables: hemoglobin &lt;dbl&gt;, albumin &lt;dbl&gt;, alp &lt;dbl&gt;, ldh &lt;dbl&gt;</span></span></code></pre></div>
 </div>
 </section><section class="level2"><h2 id="baseline-risk">Baseline risk<a class="anchor" aria-label="anchor" href="#baseline-risk"></a>
 </h2>
-<p><code><a href="../reference/predict_baseline_risk.html">predict_baseline_risk()</a></code> returns the shrunken, centered linear predictor and the 4-year risk. The <code>notes</code> column flags values outside the development data and baseline risks outside the range in which treatment effects were estimated.</p>
+<p><code><a href="../reference/predict_baseline_risk.html">predict_baseline_risk()</a></code> adds the linear predictor and the 4-year baseline risk to the patient data.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/predict_baseline_risk.html">predict_baseline_risk</a></span><span class="op">(</span><span class="va">example_patients</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   row linear_predictor baseline_risk in_effect_range</span></span>
-<span><span class="co">#&gt; 1   1       -0.6579870     0.1963982            TRUE</span></span>
-<span><span class="co">#&gt; 2   2       -0.3946690     0.2476209            TRUE</span></span>
-<span><span class="co">#&gt; 3   3        0.8187273     0.6160547            TRUE</span></span>
-<span><span class="co">#&gt; 4   4        1.6781886     0.8956950            TRUE</span></span>
-<span><span class="co">#&gt; 5   5        1.5096961     0.8519254            TRUE</span></span>
-<span><span class="co">#&gt; 6   6        2.2931052     0.9846912           FALSE</span></span>
-<span><span class="co">#&gt;                                                                                                                                             notes</span></span>
-<span><span class="co">#&gt; 1                                                                                                                                            &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; 2                                                                                                                                            &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; 3                                                                                                                                            &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; 4                                                                                                                                            &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; 5                                                                                                                                            &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; 6 Baseline risk is outside the range in which treatment effects were estimated (19% to 96%); effects are shown at the nearest edge of that range.</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">patients</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/predict_baseline_risk.html">predict_baseline_risk</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">patient_id</span>, <span class="va">linear_predictor</span>, <span class="va">baseline_risk</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 6 × 3</span></span>
+<span><span class="co">#&gt;   patient_id linear_predictor baseline_risk</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;                 &lt;dbl&gt;         &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 P1                   -0.658         0.196</span></span>
+<span><span class="co">#&gt; 2 P2                   -0.395         0.248</span></span>
+<span><span class="co">#&gt; 3 P3                    0.819         0.616</span></span>
+<span><span class="co">#&gt; 4 P4                    1.68          0.896</span></span>
+<span><span class="co">#&gt; 5 P5                    1.51          0.852</span></span>
+<span><span class="co">#&gt; 6 P6                    2.29          0.985</span></span></code></pre></div>
 </div>
 </section><section class="level2"><h2 id="treatment-effects">Treatment effects<a class="anchor" aria-label="anchor" href="#treatment-effects"></a>
 </h2>
-<p><code><a href="../reference/estimate_treatment_effect.html">estimate_treatment_effect()</a></code> returns, in long format, the absolute risk difference at 4 years (<code>ard</code>), the restricted mean survival time difference through 4 years in months (<code>rmst</code>), and the hazard ratio (<code>hr</code>), each with a 95% confidence interval (<code>conf_low</code>, <code>conf_high</code>).</p>
+<p><code><a href="../reference/estimate_treatment_effect.html">estimate_treatment_effect()</a></code> adds the baseline risk and, for each requested scale, the estimate with its 95% confidence interval: the difference in the proportion of patients alive at 4 years (<code>ard</code>), the difference in restricted mean survival time through 4 years in months (<code>rmst</code>), and the hazard ratio for death (<code>hr</code>). A warning names the patients whose baseline risk lies outside the range in which effects were estimated; their effects are taken at the nearest edge of that range.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">effects</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/estimate_treatment_effect.html">estimate_treatment_effect</a></span><span class="op">(</span><span class="va">example_patients</span><span class="op">)</span></span>
-<span><span class="va">effects</span><span class="op">[</span><span class="va">effects</span><span class="op">$</span><span class="va">row</span> <span class="op">==</span> <span class="fl">3</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"scale"</span>, <span class="st">"estimate"</span>, <span class="st">"conf_low"</span>, <span class="st">"conf_high"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;   scale  estimate  conf_low conf_high</span></span>
-<span><span class="co">#&gt; 7   ard 0.1564764 0.1044090 0.2085438</span></span>
-<span><span class="co">#&gt; 8  rmst 5.0448804 3.5714697 6.5182911</span></span>
-<span><span class="co">#&gt; 9    hr 0.6037809 0.5201066 0.7009167</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">effects</span> <span class="op">&lt;-</span> <span class="va">patients</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/estimate_treatment_effect.html">estimate_treatment_effect</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: 1 patient has a baseline risk outside the range in which treatment effects were</span></span>
+<span><span class="co">#&gt; estimated (19% to 96%).</span></span>
+<span><span class="co">#&gt; ℹ Their effects are taken at the nearest edge of that range.</span></span>
+<span><span class="co">#&gt; ℹ Row: 6.</span></span>
+<span><span class="va">effects</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">patient_id</span>, <span class="va">baseline_risk</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ard"</span>, <span class="st">"rmst"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 6 × 8</span></span>
+<span><span class="co">#&gt;   patient_id baseline_risk      ard ard_conf_low ard_conf_high  rmst</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;              &lt;dbl&gt;    &lt;dbl&gt;        &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 P1                 0.196 0.000283    -0.0945          0.0951 0.618</span></span>
+<span><span class="co">#&gt; 2 P2                 0.248 0.0557       0.000993        0.110  0.999</span></span>
+<span><span class="co">#&gt; 3 P3                 0.616 0.156        0.104           0.209  5.04 </span></span>
+<span><span class="co">#&gt; 4 P4                 0.896 0.128        0.0643          0.191  3.95 </span></span>
+<span><span class="co">#&gt; 5 P5                 0.852 0.134        0.0804          0.188  4.36 </span></span>
+<span><span class="co">#&gt; 6 P6                 0.985 0.113        0.0146          0.212  2.99 </span></span>
+<span><span class="co">#&gt; # ℹ 2 more variables: rmst_conf_low &lt;dbl&gt;, rmst_conf_high &lt;dbl&gt;</span></span></code></pre></div>
 </div>
-</section><section class="level2"><h2 id="checking-inputs">Checking inputs<a class="anchor" aria-label="anchor" href="#checking-inputs"></a>
-</h2>
-<p><code><a href="../reference/check_inputs.html">check_inputs()</a></code> stops with an informative error for missing or impossible values and returns warnings and notes for values outside the development data.</p>
+<p>For reporting, express the risk and the absolute risk difference per 100 patients.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">patient</span> <span class="op">&lt;-</span> <span class="va">example_patients</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span></span>
-<span><span class="va">patient</span><span class="op">$</span><span class="va">hemoglobin</span> <span class="op">&lt;-</span> <span class="op">-</span><span class="fl">1</span></span>
-<span><span class="fu"><a href="../reference/check_inputs.html">check_inputs</a></span><span class="op">(</span><span class="va">patient</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Error in `check_inputs()`:</span></span>
+<code class="sourceCode R"><span><span class="va">effects</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">baseline_risk</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"ard"</span><span class="op">)</span><span class="op">)</span>, \<span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fl">100</span> <span class="op">*</span> <span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">patient_id</span>, <span class="va">baseline_risk</span>, <span class="va">ard</span>, <span class="va">ard_conf_low</span>, <span class="va">ard_conf_high</span>, <span class="va">hr</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 6 × 6</span></span>
+<span><span class="co">#&gt;   patient_id baseline_risk   ard ard_conf_low ard_conf_high    hr</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;              &lt;dbl&gt; &lt;dbl&gt;        &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 P1                    20     0           -9            10 0.755</span></span>
+<span><span class="co">#&gt; 2 P2                    25     6            0            11 0.708</span></span>
+<span><span class="co">#&gt; 3 P3                    62    16           10            21 0.604</span></span>
+<span><span class="co">#&gt; 4 P4                    90    13            6            19 0.685</span></span>
+<span><span class="co">#&gt; 5 P5                    85    13            8            19 0.664</span></span>
+<span><span class="co">#&gt; 6 P6                    98    11            1            21 0.736</span></span></code></pre></div>
+</div>
+</section><section class="level2"><h2 id="input-checks">Input checks<a class="anchor" aria-label="anchor" href="#input-checks"></a>
+</h2>
+<p>Both functions check the inputs before predicting. Missing or impossible values stop with an error that names the row and input.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">patients</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>hemoglobin <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">patient_id</span> <span class="op">==</span> <span class="st">"P1"</span>, <span class="op">-</span><span class="fl">1</span>, <span class="va">hemoglobin</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/predict_baseline_risk.html">predict_baseline_risk</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error in `predict_baseline_risk()`:</span></span>
 <span><span class="co">#&gt; ! `newdata` has invalid or missing values.</span></span>
 <span><span class="co">#&gt; ✖ Row 1: Hemoglobin must be between 20 and 250 g/L.</span></span></code></pre></div>
 </div>
+<p>Values outside the range in the trial data give a warning, because their estimates are extrapolations.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">patient</span><span class="op">$</span><span class="va">hemoglobin</span> <span class="op">&lt;-</span> <span class="fl">150</span></span>
-<span><span class="va">patient</span><span class="op">$</span><span class="va">psa</span> <span class="op">&lt;-</span> <span class="fl">20000</span></span>
-<span><span class="fu"><a href="../reference/check_inputs.html">check_inputs</a></span><span class="op">(</span><span class="va">patient</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   row input severity</span></span>
-<span><span class="co">#&gt; 1   1   psa     note</span></span>
-<span><span class="co">#&gt;                                                                                                  message</span></span>
-<span><span class="co">#&gt; 1 Prostate-specific antigen values above 8,322 ng/mL are scored as 8,322 ng/mL, as in model development.</span></span></code></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">patients</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>hemoglobin <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">patient_id</span> <span class="op">==</span> <span class="st">"P2"</span>, <span class="fl">50</span>, <span class="va">hemoglobin</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/predict_baseline_risk.html">predict_baseline_risk</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">patient_id</span>, <span class="va">hemoglobin</span>, <span class="va">baseline_risk</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: Some values are outside the range in the trial data; their estimates are</span></span>
+<span><span class="co">#&gt; extrapolations.</span></span>
+<span><span class="co">#&gt; ! Row 2: Hemoglobin of 50 g/L is outside the range in the trial data (57 to 186</span></span>
+<span><span class="co">#&gt;   g/L); the estimate is an extrapolation.</span></span>
+<span><span class="co">#&gt; # A tibble: 6 × 3</span></span>
+<span><span class="co">#&gt;   patient_id hemoglobin baseline_risk</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;           &lt;dbl&gt;         &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 P1                150         0.196</span></span>
+<span><span class="co">#&gt; 2 P2                 50         0.651</span></span>
+<span><span class="co">#&gt; 3 P3                128         0.616</span></span>
+<span><span class="co">#&gt; 4 P4                115         0.896</span></span>
+<span><span class="co">#&gt; 5 P5                120         0.852</span></span>
+<span><span class="co">#&gt; 6 P6                105         0.985</span></span></code></pre></div>
 </div>
 </section><section class="level2"><h2 id="model-specification">Model specification<a class="anchor" aria-label="anchor" href="#model-specification"></a>
 </h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/mhspc_model.html">mhspc_model</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; mHSPC ARPI treatment-effect model (261002-raw-rcs)</span></span>
-<span><span class="co">#&gt; • Baseline risk: All-cause death within 4 years with Placebo plus ADT.</span></span>
+<span><span class="co">#&gt; • Baseline risk: All-cause death within 4 years with ADT alone.</span></span>
 <span><span class="co">#&gt; • Inputs: ecog_ps, gleason_score, visceral_metastasis, bone_metastases, psa,</span></span>
 <span><span class="co">#&gt;   hemoglobin, albumin, alp, and ldh.</span></span>
 <span><span class="co">#&gt; • Treatment effects of ARPI plus ADT: survival difference, restricted mean</span></span>

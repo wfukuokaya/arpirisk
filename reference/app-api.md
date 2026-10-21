@@ -4,10 +4,9 @@ Lower-level functions used by the web calculator, which is developed in
 a separate repository (<https://github.com/wfukuokaya/arpirisk-app>) and
 calls them step by step. They may change between minor versions;
 analyses should use
-[`predict_baseline_risk()`](https://wfukuokaya.github.io/arpirisk/reference/predict_baseline_risk.md),
-[`estimate_treatment_effect()`](https://wfukuokaya.github.io/arpirisk/reference/estimate_treatment_effect.md),
+[`predict_baseline_risk()`](https://wfukuokaya.github.io/arpirisk/reference/predict_baseline_risk.md)
 and
-[`check_inputs()`](https://wfukuokaya.github.io/arpirisk/reference/check_inputs.md).
+[`estimate_treatment_effect()`](https://wfukuokaya.github.io/arpirisk/reference/estimate_treatment_effect.md).
 
 ## Functions
 

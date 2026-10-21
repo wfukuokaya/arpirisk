@@ -11,8 +11,6 @@
 
 - [`model_inputs()`](https://wfukuokaya.github.io/arpirisk/reference/model_inputs.md)
   : Describe the model inputs
-- [`check_inputs()`](https://wfukuokaya.github.io/arpirisk/reference/check_inputs.md)
-  : Check patient data before prediction
 - [`mhspc_model()`](https://wfukuokaya.github.io/arpirisk/reference/mhspc_model.md)
   : Load the risk model and treatment-effect estimates
 - [`example_patients`](https://wfukuokaya.github.io/arpirisk/reference/example_patients.md)

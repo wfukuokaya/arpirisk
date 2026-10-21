@@ -1,8 +1,8 @@
 # Predict baseline risk of death
 
-Calculates each patient's predicted risk of death within 4 years with
-placebo plus androgen deprivation therapy (ADT). Treatment-effect
-estimates are indexed on this baseline risk.
+Adds each patient's linear predictor and predicted risk of death within
+4 years with androgen deprivation therapy (ADT) alone, called baseline
+risk.
 
 ## Usage
 
@@ -21,7 +21,7 @@ predict_baseline_risk(newdata, model = mhspc_model())
   `visceral_metastasis` (0 or 1, or logical), `bone_metastases` (a
   count, or a category code `"0-3"`, `"4-6"`, `"7-10"`, or `"11+"`),
   `psa` (ng/mL), `hemoglobin` (g/L), `albumin` (g/L), `alp` (U/L), and
-  `ldh` (U/L). Other columns are ignored.
+  `ldh` (U/L). Other columns are kept unchanged.
 
 - model:
 
@@ -30,43 +30,32 @@ predict_baseline_risk(newdata, model = mhspc_model())
 
 ## Value
 
-A data frame with one row per patient in `newdata`:
-
-- row:
-
-  Row number in `newdata`.
-
-- linear_predictor:
-
-  Linear predictor for placebo plus ADT.
-
-- baseline_risk:
-
-  Predicted 4-year risk of death, as a proportion.
-
-- in_effect_range:
-
-  Whether the baseline risk lies within the range in which treatment
-  effects were estimated.
-
-- notes:
-
-  Warnings and notes about the inputs, or `NA`.
+`newdata` with two columns added: `linear_predictor`, the model's risk
+score, and `baseline_risk`, the predicted 4-year risk of death as a
+proportion. Existing columns with these names are replaced.
 
 ## Details
 
-The linear predictor is the shrunken, centered Cox linear predictor for
-placebo plus ADT.
+Inputs are checked first. Missing or invalid values stop with an error
+that names the row and input. Values outside the range in the trial data
+give a warning, because their estimates are extrapolations. Values above
+the upper cap used in model development are scored at the cap, with a
+message.
 
 ## Examples
 
 ``` r
-patient <- data.frame(
-  ecog_ps = 0, gleason_score = 9, visceral_metastasis = 0,
-  bone_metastases = 8, psa = 45, hemoglobin = 128, albumin = 41,
-  alp = 180, ldh = 210
+# Your own patient data: one row per patient, one column per input, plus any
+# other columns, which are kept.
+patients <- data.frame(
+  patient_id = c("A", "B"),
+  ecog_ps = c(0, 1), gleason_score = c(9, 9), visceral_metastasis = c(0, 0),
+  bone_metastases = c(8, 15), psa = c(45, 150), hemoglobin = c(128, 115),
+  albumin = c(41, 38), alp = c(180, 420), ldh = c(210, 280)
 )
-predict_baseline_risk(patient)
-#>   row linear_predictor baseline_risk in_effect_range notes
-#> 1   1        0.8187273     0.6160547            TRUE  <NA>
+risk <- predict_baseline_risk(patients)
+risk[c("patient_id", "baseline_risk")]
+#>   patient_id baseline_risk
+#> 1          A     0.6160547
+#> 2          B     0.8956950
 ```
