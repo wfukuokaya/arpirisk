@@ -1,4 +1,4 @@
 # License
 
     YEAR: 2026
-    COPYRIGHT HOLDER: arpirisk authors
+    COPYRIGHT HOLDER: Wataru Fukuokaya
