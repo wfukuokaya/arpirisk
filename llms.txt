@@ -49,17 +49,9 @@ See
 ## Model
 
 The model (version 261002-raw-rcs) is stored as aggregate parameters in
-`inst/extdata/model_spec.json`, built from the analysis export with
-`data-raw/build_model_spec.R`. Tests compare the package with reference
-profiles scored by the analysis code and with a simulated cohort
-(`data-raw/synthetic_cohort_check.R`); comparison with `rms` predictions
-from the analysis run (`data-raw/remote_golden_cases.R`) is pending.
-
-To update the model: run `data-raw/remote_golden_cases.R` after the
-analysis script, rebuild the specification with
-`Rscript data-raw/build_model_spec.R path/to/model_export.txt`, add
-`golden_cases.csv` to `tests/testthat/fixtures/`, run the tests, and
-update the version and `NEWS.md`.
+`inst/extdata/model_spec.json`, built from the analysis export by
+`data-raw/build_model_spec.R`. Tests compare the package against
+reference profiles and a simulated cohort scored by the analysis code.
 
 ## Citation
 

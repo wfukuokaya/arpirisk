@@ -86,8 +86,7 @@
 <div class="section level2">
 <h2 id="model">Model<a class="anchor" aria-label="anchor" href="#model"></a>
 </h2>
-<p>The model (version 261002-raw-rcs) is stored as aggregate parameters in <code>inst/extdata/model_spec.json</code>, built from the analysis export with <code>data-raw/build_model_spec.R</code>. Tests compare the package with reference profiles scored by the analysis code and with a simulated cohort (<code>data-raw/synthetic_cohort_check.R</code>); comparison with <code>rms</code> predictions from the analysis run (<code>data-raw/remote_golden_cases.R</code>) is pending.</p>
-<p>To update the model: run <code>data-raw/remote_golden_cases.R</code> after the analysis script, rebuild the specification with <code>Rscript data-raw/build_model_spec.R path/to/model_export.txt</code>, add <code>golden_cases.csv</code> to <code>tests/testthat/fixtures/</code>, run the tests, and update the version and <code>NEWS.md</code>.</p>
+<p>The model (version 261002-raw-rcs) is stored as aggregate parameters in <code>inst/extdata/model_spec.json</code>, built from the analysis export by <code>data-raw/build_model_spec.R</code>. Tests compare the package against reference profiles and a simulated cohort scored by the analysis code.</p>
 </div>
 <div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
