@@ -49,26 +49,35 @@ patients
 #> # ℹ 4 more variables: hemoglobin <dbl>, albumin <dbl>, alp <dbl>, ldh <dbl>
 ```
 
-## Baseline risk
+## Predicted risk
 
-[`predict_baseline_risk()`](https://wfukuokaya.github.io/arpirisk/reference/predict_baseline_risk.md)
-adds the linear predictor and the 4-year baseline risk to the patient
-data.
+[`predict_risk()`](https://wfukuokaya.github.io/arpirisk/reference/predict_risk.md)
+adds the linear predictor and the 4-year risk of death with ADT alone
+(`baseline_risk`) and with an ARPI plus ADT (`arpi_risk`) to the patient
+data. The risk with an ARPI is the baseline risk minus the absolute risk
+difference at that baseline risk, so it follows the treatment effects
+described below and gives the same warning for baseline risks outside
+the range in which effects were estimated. Use `treatment = "adt"` or
+`treatment = "arpi"` to add only one of the two risks.
 
 ``` r
 
 patients |>
-  predict_baseline_risk() |>
-  select(patient_id, linear_predictor, baseline_risk)
-#> # A tibble: 6 × 3
-#>   patient_id linear_predictor baseline_risk
-#>   <chr>                 <dbl>         <dbl>
-#> 1 P1                   -0.658         0.196
-#> 2 P2                   -0.395         0.248
-#> 3 P3                    0.819         0.616
-#> 4 P4                    1.68          0.896
-#> 5 P5                    1.51          0.852
-#> 6 P6                    2.29          0.985
+  predict_risk() |>
+  select(patient_id, linear_predictor, baseline_risk, arpi_risk)
+#> Warning: 1 patient has a baseline risk outside the range in which treatment effects were
+#> estimated (19% to 96%).
+#> ℹ Their effects are taken at the nearest edge of that range.
+#> ℹ Row: 6.
+#> # A tibble: 6 × 4
+#>   patient_id linear_predictor baseline_risk arpi_risk
+#>   <chr>                 <dbl>         <dbl>     <dbl>
+#> 1 P1                   -0.658         0.196     0.196
+#> 2 P2                   -0.395         0.248     0.192
+#> 3 P3                    0.819         0.616     0.460
+#> 4 P4                    1.68          0.896     0.768
+#> 5 P5                    1.51          0.852     0.718
+#> 6 P6                    2.29          0.985     0.872
 ```
 
 ## Treatment effects
@@ -132,8 +141,8 @@ values stop with an error that names the row and input.
 
 patients |>
   mutate(hemoglobin = if_else(patient_id == "P1", -1, hemoglobin)) |>
-  predict_baseline_risk()
-#> Error in `predict_baseline_risk()`:
+  predict_risk()
+#> Error in `predict_risk()`:
 #> ! `newdata` has invalid or missing values.
 #> ✖ Row 1: Hemoglobin must be between 20 and 250 g/L.
 ```
@@ -145,7 +154,7 @@ estimates are extrapolations.
 
 patients |>
   mutate(hemoglobin = if_else(patient_id == "P2", 50, hemoglobin)) |>
-  predict_baseline_risk() |>
+  predict_risk(treatment = "adt") |>
   select(patient_id, hemoglobin, baseline_risk)
 #> Warning: Some values are outside the range in the trial data; their estimates are
 #> extrapolations.

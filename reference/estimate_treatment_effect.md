@@ -51,7 +51,7 @@ Positive absolute effects indicate gains with an ARPI. For baseline
 risks outside the range in which effects were estimated, the effect at
 the nearest edge of that range is returned, with a warning. Inputs are
 checked as in
-[`predict_baseline_risk()`](https://wfukuokaya.github.io/arpirisk/reference/predict_baseline_risk.md).
+[`predict_risk()`](https://wfukuokaya.github.io/arpirisk/reference/predict_risk.md).
 
 ## Examples
 

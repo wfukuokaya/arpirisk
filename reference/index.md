@@ -2,8 +2,8 @@
 
 ## Predictions
 
-- [`predict_baseline_risk()`](https://wfukuokaya.github.io/arpirisk/reference/predict_baseline_risk.md)
-  : Predict baseline risk of death
+- [`predict_risk()`](https://wfukuokaya.github.io/arpirisk/reference/predict_risk.md)
+  : Predict risk of death with ADT alone or with an ARPI plus ADT
 - [`estimate_treatment_effect()`](https://wfukuokaya.github.io/arpirisk/reference/estimate_treatment_effect.md)
   : Estimate treatment effects at a patient's baseline risk
 

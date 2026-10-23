@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">arpirisk</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,9 +80,9 @@
 <span>  albumin <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">41</span>, <span class="fl">38</span><span class="op">)</span>, alp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">180</span>, <span class="fl">420</span><span class="op">)</span>, ldh <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">210</span>, <span class="fl">280</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 4-year risk of death with ADT alone</span></span>
-<span><span class="va">risk</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/predict_baseline_risk.html">predict_baseline_risk</a></span><span class="op">(</span><span class="va">patients</span><span class="op">)</span></span>
-<span><span class="va">risk</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"patient_id"</span>, <span class="st">"baseline_risk"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co"># 4-year risk of death with ADT alone and with an ARPI plus ADT</span></span>
+<span><span class="va">risk</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/predict_risk.html">predict_risk</a></span><span class="op">(</span><span class="va">patients</span><span class="op">)</span></span>
+<span><span class="va">risk</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"patient_id"</span>, <span class="st">"baseline_risk"</span>, <span class="st">"arpi_risk"</span><span class="op">)</span><span class="op">]</span></span>
 <span></span>
 <span><span class="co"># Difference in the proportion alive at 4 years with an ARPI, with 95% CI</span></span>
 <span><span class="va">effects</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/estimate_treatment_effect.html">estimate_treatment_effect</a></span><span class="op">(</span><span class="va">patients</span>, scale <span class="op">=</span> <span class="st">"ard"</span><span class="op">)</span></span>

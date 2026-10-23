@@ -24,7 +24,11 @@ Created in `data-raw/example_patients.R`.
 ## Examples
 
 ``` r
-predict_baseline_risk(example_patients)
+predict_risk(example_patients)
+#> Warning: 1 patient has a baseline risk outside the range in which treatment effects were
+#> estimated (19% to 96%).
+#> ℹ Their effects are taken at the nearest edge of that range.
+#> ℹ Row: 6.
 #>   patient_id ecog_ps gleason_score visceral_metastasis bone_metastases psa
 #> 1         P1       0             7                   0               0   5
 #> 2         P2       0             8                   0               2  12
@@ -32,11 +36,11 @@ predict_baseline_risk(example_patients)
 #> 4         P4       1             9                   0              15 150
 #> 5         P5       1             8                   1               5  30
 #> 6         P6       2            10                   1              30 800
-#>   hemoglobin albumin alp ldh linear_predictor baseline_risk
-#> 1        150      46  70 160       -0.6579870     0.1963982
-#> 2        142      44  80 170       -0.3946690     0.2476209
-#> 3        128      41 180 210        0.8187273     0.6160547
-#> 4        115      38 420 280        1.6781886     0.8956950
-#> 5        120      36 150 320        1.5096961     0.8519254
-#> 6        105      34 500 350        2.2931052     0.9846912
+#>   hemoglobin albumin alp ldh linear_predictor baseline_risk arpi_risk
+#> 1        150      46  70 160       -0.6579870     0.1963982 0.1961150
+#> 2        142      44  80 170       -0.3946690     0.2476209 0.1919254
+#> 3        128      41 180 210        0.8187273     0.6160547 0.4595782
+#> 4        115      38 420 280        1.6781886     0.8956950 0.7680623
+#> 5        120      36 150 320        1.5096961     0.8519254 0.7179856
+#> 6        105      34 500 350        2.2931052     0.9846912 0.8715144
 ```

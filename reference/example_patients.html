@@ -11,7 +11,7 @@ and tests. They are not trial participants. Values are in the model's units
 
     <a class="navbar-brand me-2" href="../index.html">arpirisk</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,7 +62,11 @@ model inputs <code>ecog_ps</code>, <code>gleason_score</code>, <code>visceral_me
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="predict_baseline_risk.html">predict_baseline_risk</a></span><span class="op">(</span><span class="va">example_patients</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="predict_risk.html">predict_risk</a></span><span class="op">(</span><span class="va">example_patients</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>1 patient has a baseline risk outside the range in which treatment effects were</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> estimated (19% to 96%).</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Their effects are taken at the nearest edge of that range.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Row: 6.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   patient_id ecog_ps gleason_score visceral_metastasis bone_metastases psa</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1         P1       0             7                   0               0   5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2         P2       0             8                   0               2  12</span>
@@ -70,13 +74,13 @@ model inputs <code>ecog_ps</code>, <code>gleason_score</code>, <code>visceral_me
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4         P4       1             9                   0              15 150</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5         P5       1             8                   1               5  30</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6         P6       2            10                   1              30 800</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   hemoglobin albumin alp ldh linear_predictor baseline_risk</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1        150      46  70 160       -0.6579870     0.1963982</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2        142      44  80 170       -0.3946690     0.2476209</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3        128      41 180 210        0.8187273     0.6160547</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4        115      38 420 280        1.6781886     0.8956950</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5        120      36 150 320        1.5096961     0.8519254</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6        105      34 500 350        2.2931052     0.9846912</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   hemoglobin albumin alp ldh linear_predictor baseline_risk arpi_risk</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1        150      46  70 160       -0.6579870     0.1963982 0.1961150</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2        142      44  80 170       -0.3946690     0.2476209 0.1919254</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3        128      41 180 210        0.8187273     0.6160547 0.4595782</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4        115      38 420 280        1.6781886     0.8956950 0.7680623</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5        120      36 150 320        1.5096961     0.8519254 0.7179856</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6        105      34 500 350        2.2931052     0.9846912 0.8715144</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

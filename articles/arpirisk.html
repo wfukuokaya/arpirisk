@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">arpirisk</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -100,23 +100,27 @@
 <span><span class="co">#&gt; 6 P6               2            10                   1              30   800</span></span>
 <span><span class="co">#&gt; # ℹ 4 more variables: hemoglobin &lt;dbl&gt;, albumin &lt;dbl&gt;, alp &lt;dbl&gt;, ldh &lt;dbl&gt;</span></span></code></pre></div>
 </div>
-</section><section class="level2"><h2 id="baseline-risk">Baseline risk<a class="anchor" aria-label="anchor" href="#baseline-risk"></a>
+</section><section class="level2"><h2 id="predicted-risk">Predicted risk<a class="anchor" aria-label="anchor" href="#predicted-risk"></a>
 </h2>
-<p><code><a href="../reference/predict_baseline_risk.html">predict_baseline_risk()</a></code> adds the linear predictor and the 4-year baseline risk to the patient data.</p>
+<p><code><a href="../reference/predict_risk.html">predict_risk()</a></code> adds the linear predictor and the 4-year risk of death with ADT alone (<code>baseline_risk</code>) and with an ARPI plus ADT (<code>arpi_risk</code>) to the patient data. The risk with an ARPI is the baseline risk minus the absolute risk difference at that baseline risk, so it follows the treatment effects described below and gives the same warning for baseline risks outside the range in which effects were estimated. Use <code>treatment = "adt"</code> or <code>treatment = "arpi"</code> to add only one of the two risks.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">patients</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/predict_baseline_risk.html">predict_baseline_risk</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">patient_id</span>, <span class="va">linear_predictor</span>, <span class="va">baseline_risk</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 6 × 3</span></span>
-<span><span class="co">#&gt;   patient_id linear_predictor baseline_risk</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;                 &lt;dbl&gt;         &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 P1                   -0.658         0.196</span></span>
-<span><span class="co">#&gt; 2 P2                   -0.395         0.248</span></span>
-<span><span class="co">#&gt; 3 P3                    0.819         0.616</span></span>
-<span><span class="co">#&gt; 4 P4                    1.68          0.896</span></span>
-<span><span class="co">#&gt; 5 P5                    1.51          0.852</span></span>
-<span><span class="co">#&gt; 6 P6                    2.29          0.985</span></span></code></pre></div>
+<span>  <span class="fu"><a href="../reference/predict_risk.html">predict_risk</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">patient_id</span>, <span class="va">linear_predictor</span>, <span class="va">baseline_risk</span>, <span class="va">arpi_risk</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: 1 patient has a baseline risk outside the range in which treatment effects were</span></span>
+<span><span class="co">#&gt; estimated (19% to 96%).</span></span>
+<span><span class="co">#&gt; ℹ Their effects are taken at the nearest edge of that range.</span></span>
+<span><span class="co">#&gt; ℹ Row: 6.</span></span>
+<span><span class="co">#&gt; # A tibble: 6 × 4</span></span>
+<span><span class="co">#&gt;   patient_id linear_predictor baseline_risk arpi_risk</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;                 &lt;dbl&gt;         &lt;dbl&gt;     &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 P1                   -0.658         0.196     0.196</span></span>
+<span><span class="co">#&gt; 2 P2                   -0.395         0.248     0.192</span></span>
+<span><span class="co">#&gt; 3 P3                    0.819         0.616     0.460</span></span>
+<span><span class="co">#&gt; 4 P4                    1.68          0.896     0.768</span></span>
+<span><span class="co">#&gt; 5 P5                    1.51          0.852     0.718</span></span>
+<span><span class="co">#&gt; 6 P6                    2.29          0.985     0.872</span></span></code></pre></div>
 </div>
 </section><section class="level2"><h2 id="treatment-effects">Treatment effects<a class="anchor" aria-label="anchor" href="#treatment-effects"></a>
 </h2>
@@ -165,8 +169,8 @@
 <div class="sourceCode cell-code" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">patients</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>hemoglobin <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">patient_id</span> <span class="op">==</span> <span class="st">"P1"</span>, <span class="op">-</span><span class="fl">1</span>, <span class="va">hemoglobin</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/predict_baseline_risk.html">predict_baseline_risk</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Error in `predict_baseline_risk()`:</span></span>
+<span>  <span class="fu"><a href="../reference/predict_risk.html">predict_risk</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error in `predict_risk()`:</span></span>
 <span><span class="co">#&gt; ! `newdata` has invalid or missing values.</span></span>
 <span><span class="co">#&gt; ✖ Row 1: Hemoglobin must be between 20 and 250 g/L.</span></span></code></pre></div>
 </div>
@@ -175,7 +179,7 @@
 <div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">patients</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>hemoglobin <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">patient_id</span> <span class="op">==</span> <span class="st">"P2"</span>, <span class="fl">50</span>, <span class="va">hemoglobin</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/predict_baseline_risk.html">predict_baseline_risk</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/predict_risk.html">predict_risk</a></span><span class="op">(</span>treatment <span class="op">=</span> <span class="st">"adt"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">patient_id</span>, <span class="va">hemoglobin</span>, <span class="va">baseline_risk</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Some values are outside the range in the trial data; their estimates are</span></span>
 <span><span class="co">#&gt; extrapolations.</span></span>

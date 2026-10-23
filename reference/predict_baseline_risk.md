@@ -1,8 +1,8 @@
 # Predict baseline risk of death
 
-Adds each patient's linear predictor and predicted risk of death within
-4 years with androgen deprivation therapy (ADT) alone, called baseline
-risk.
+Deprecated: use
+[`predict_risk()`](https://wfukuokaya.github.io/arpirisk/reference/predict_risk.md)
+with `treatment = "adt"`, which returns the same columns.
 
 ## Usage
 
@@ -30,32 +30,4 @@ predict_baseline_risk(newdata, model = mhspc_model())
 
 ## Value
 
-`newdata` with two columns added: `linear_predictor`, the model's risk
-score, and `baseline_risk`, the predicted 4-year risk of death as a
-proportion. Existing columns with these names are replaced.
-
-## Details
-
-Inputs are checked first. Missing or invalid values stop with an error
-that names the row and input. Values outside the range in the trial data
-give a warning, because their estimates are extrapolations. Values above
-the upper cap used in model development are scored at the cap, with a
-message.
-
-## Examples
-
-``` r
-# Your own patient data: one row per patient, one column per input, plus any
-# other columns, which are kept.
-patients <- data.frame(
-  patient_id = c("A", "B"),
-  ecog_ps = c(0, 1), gleason_score = c(9, 9), visceral_metastasis = c(0, 0),
-  bone_metastases = c(8, 15), psa = c(45, 150), hemoglobin = c(128, 115),
-  albumin = c(41, 38), alp = c(180, 420), ldh = c(210, 280)
-)
-risk <- predict_baseline_risk(patients)
-risk[c("patient_id", "baseline_risk")]
-#>   patient_id baseline_risk
-#> 1          A     0.6160547
-#> 2          B     0.8956950
-```
+`newdata` with `linear_predictor` and `baseline_risk` added.
