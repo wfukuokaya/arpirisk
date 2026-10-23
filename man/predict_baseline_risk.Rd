@@ -17,29 +17,10 @@ input listed by \code{\link[=model_inputs]{model_inputs()}}: \code{ecog_ps} (0, 
 \item{model}{An \code{mhspc_model} object from \code{\link[=mhspc_model]{mhspc_model()}}.}
 }
 \value{
-\code{newdata} with two columns added: \code{linear_predictor}, the model's
-risk score, and \code{baseline_risk}, the predicted 4-year risk of death as a
-proportion. Existing columns with these names are replaced.
+\code{newdata} with \code{linear_predictor} and \code{baseline_risk} added.
 }
 \description{
-Adds each patient's linear predictor and predicted risk of death within 4
-years with androgen deprivation therapy (ADT) alone, called baseline risk.
+Deprecated: use \code{\link[=predict_risk]{predict_risk()}} with \code{treatment = "adt"}, which returns
+the same columns.
 }
-\details{
-Inputs are checked first. Missing or invalid values stop with an error that
-names the row and input. Values outside the range in the trial data give a
-warning, because their estimates are extrapolations. Values above the upper
-cap used in model development are scored at the cap, with a message.
-}
-\examples{
-# Your own patient data: one row per patient, one column per input, plus any
-# other columns, which are kept.
-patients <- data.frame(
-  patient_id = c("A", "B"),
-  ecog_ps = c(0, 1), gleason_score = c(9, 9), visceral_metastasis = c(0, 0),
-  bone_metastases = c(8, 15), psa = c(45, 150), hemoglobin = c(128, 115),
-  albumin = c(41, 38), alp = c(180, 420), ldh = c(210, 280)
-)
-risk <- predict_baseline_risk(patients)
-risk[c("patient_id", "baseline_risk")]
-}
+\keyword{internal}

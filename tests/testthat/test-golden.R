@@ -15,7 +15,7 @@ test_that("predictions match rms golden cases from the analysis run", {
     "ecog_ps", "gleason_score", "visceral_metastasis", "bone_metastases",
     "psa", "hemoglobin", "albumin", "alp", "ldh"
   )]
-  risk <- quietly(predict_baseline_risk(inputs, model))
+  risk <- quietly(predict_risk(inputs, model = model))
   expect_equal(risk$linear_predictor, golden$linear_predictor, tolerance = 1e-8)
   expect_equal(risk$baseline_risk, golden$baseline_risk, tolerance = 1e-8)
 

@@ -1,3 +1,14 @@
+# arpirisk (development version)
+
+* New `predict_risk()` adds the predicted 4-year risk of death with ADT alone
+  (`baseline_risk`), with an ARPI plus ADT (`arpi_risk`), or both, chosen
+  with `treatment = c("adt", "arpi")`. The risk with an ARPI is the baseline
+  risk minus the absolute risk difference at that risk; when it is requested,
+  baseline risks outside the range in which treatment effects were estimated
+  give the same warning as in `estimate_treatment_effect()`.
+* `predict_baseline_risk()` is deprecated. Use
+  `predict_risk(treatment = "adt")`, which returns the same columns.
+
 # arpirisk 0.1.0
 
 * Initial release.

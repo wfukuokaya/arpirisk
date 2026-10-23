@@ -9,5 +9,5 @@
 #'   `bone_metastases`, `psa`, `hemoglobin`, `albumin`, `alp`, and `ldh`.
 #' @source Created in `data-raw/example_patients.R`.
 #' @examples
-#' predict_baseline_risk(example_patients)
+#' predict_risk(example_patients)
 "example_patients"

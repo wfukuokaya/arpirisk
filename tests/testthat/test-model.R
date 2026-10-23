@@ -127,7 +127,7 @@ test_that("linear continuous terms are supported and validated", {
   model <- mhspc_model(modified_spec(make_linear(0.001)))
   inputs <- model_inputs(model)
   expect_equal(inputs$scoring[inputs$name == "alp"], "Linear")
-  lp <- function(alp) quietly(predict_baseline_risk(example_patient(alp = alp), model))$linear_predictor
+  lp <- function(alp) quietly(predict_risk(example_patient(alp = alp), model = model))$linear_predictor
   expect_equal(lp(280) - lp(180), 100 * 0.001 * model$linear_predictor$shrinkage_factor)
 
   expect_error(mhspc_model(modified_spec(make_linear(c(0.001, 0.002)))), class = "arpirisk_spec_error")
@@ -143,5 +143,5 @@ test_that("linear continuous terms are supported and validated", {
 
 test_that("functions require an mhspc_model object", {
   expect_error(model_inputs(list()), class = "arpirisk_spec_error")
-  expect_error(predict_baseline_risk(example_patient(), model = "model"), class = "arpirisk_spec_error")
+  expect_error(predict_risk(example_patient(), model = "model"), class = "arpirisk_spec_error")
 })

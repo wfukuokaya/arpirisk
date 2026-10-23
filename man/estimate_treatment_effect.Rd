@@ -40,7 +40,7 @@ androgen receptor pathway inhibitor (ARPI) to androgen deprivation therapy
 Positive absolute effects indicate gains with an ARPI. For baseline risks
 outside the range in which effects were estimated, the effect at the nearest
 edge of that range is returned, with a warning. Inputs are checked as in
-\code{\link[=predict_baseline_risk]{predict_baseline_risk()}}.
+\code{\link[=predict_risk]{predict_risk()}}.
 }
 \examples{
 patients <- example_patients[1:5, ]

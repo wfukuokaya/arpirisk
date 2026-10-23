@@ -21,6 +21,6 @@ and tests. They are not trial participants. Values are in the model's units
 (see \code{\link[=model_inputs]{model_inputs()}}).
 }
 \examples{
-predict_baseline_risk(example_patients)
+predict_risk(example_patients)
 }
 \keyword{datasets}

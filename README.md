@@ -31,9 +31,9 @@ patients <- data.frame(
   albumin = c(41, 38), alp = c(180, 420), ldh = c(210, 280)
 )
 
-# 4-year risk of death with ADT alone
-risk <- predict_baseline_risk(patients)
-risk[c("patient_id", "baseline_risk")]
+# 4-year risk of death with ADT alone and with an ARPI plus ADT
+risk <- predict_risk(patients)
+risk[c("patient_id", "baseline_risk", "arpi_risk")]
 
 # Difference in the proportion alive at 4 years with an ARPI, with 95% CI
 effects <- estimate_treatment_effect(patients, scale = "ard")

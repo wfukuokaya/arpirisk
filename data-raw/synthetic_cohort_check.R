@@ -444,9 +444,9 @@ pkgload::load_all(".", quiet = TRUE)
 model <- mhspc_model(spec_path)
 golden <- utils::read.csv(file.path(output_dir, "golden_cases.csv"))
 input_names <- model_inputs(model)$name
-golden_risk <- suppressWarnings(predict_baseline_risk(golden[input_names], model))
-golden_effects <- suppressWarnings(estimate_treatment_effect(golden[input_names], model = model))
-cohort_risk <- suppressWarnings(predict_baseline_risk(as.data.frame(cohort_cases[input_names]), model))
+golden_risk <- suppressWarnings(predict_risk(golden[input_names], treatment = "adt", model = model))
+golden_effects <- suppressWarnings(estimate_treatment_effect(golden[input_names], treatment = "adt", model = model))
+cohort_risk <- suppressWarnings(predict_risk(as.data.frame(cohort_cases[input_names]), treatment = "adt", model = model))
 placebo_inputs <- mice::complete(mids_raw, action = 1L) |>
   dplyr::mutate(NUM_BONE = cohort$NUM_BONE) |>
   dplyr::filter(ARM == 0L) |>
@@ -454,7 +454,7 @@ placebo_inputs <- mice::complete(mids_raw, action = 1L) |>
     ecog_ps = ECOG, gleason_score = ifelse(GS == 1L, 9, 8), visceral_metastasis = VIS,
     bone_metastases = NUM_BONE, psa = PSA, hemoglobin = HGB, albumin = ALB, alp = ALP, ldh = LDH
   )
-placebo_risk <- suppressWarnings(predict_baseline_risk(as.data.frame(placebo_inputs), model))
+placebo_risk <- suppressWarnings(predict_risk(as.data.frame(placebo_inputs), treatment = "adt", model = model))
 effect_difference <- function(scale) {
   max(abs(golden_effects[[scale]] - golden[[paste0(scale, "_estimate")]]))
 }

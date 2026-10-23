@@ -26,7 +26,7 @@ model_inputs <- function(model = mhspc_model()) {
     purrr::list_rbind()
 }
 
-# Checks the inputs as predict_baseline_risk() and estimate_treatment_effect()
+# Checks the inputs as predict_risk() and estimate_treatment_effect()
 # use them: errors stop, values outside the trial data warn, and capped values
 # are reported in a message.
 prepare_inputs <- function(newdata, model, call = rlang::caller_env()) {

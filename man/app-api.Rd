@@ -17,7 +17,7 @@
 Lower-level functions used by the web calculator, which is developed in a
 separate repository (\url{https://github.com/wfukuokaya/arpirisk-app}) and
 calls them step by step. They may change between minor versions; analyses
-should use \code{\link[=predict_baseline_risk]{predict_baseline_risk()}} and \code{\link[=estimate_treatment_effect]{estimate_treatment_effect()}}.
+should use \code{\link[=predict_risk]{predict_risk()}} and \code{\link[=estimate_treatment_effect]{estimate_treatment_effect()}}.
 }
 \section{Functions}{
 

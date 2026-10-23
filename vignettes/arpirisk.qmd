@@ -30,14 +30,14 @@ patients <- as_tibble(example_patients)
 patients
 ```
 
-## Baseline risk
+## Predicted risk
 
-`predict_baseline_risk()` adds the linear predictor and the 4-year baseline risk to the patient data.
+`predict_risk()` adds the linear predictor and the 4-year risk of death with ADT alone (`baseline_risk`) and with an ARPI plus ADT (`arpi_risk`) to the patient data. The risk with an ARPI is the baseline risk minus the absolute risk difference at that baseline risk, so it follows the treatment effects described below and gives the same warning for baseline risks outside the range in which effects were estimated. Use `treatment = "adt"` or `treatment = "arpi"` to add only one of the two risks.
 
 ```{r}
 patients |>
-  predict_baseline_risk() |>
-  select(patient_id, linear_predictor, baseline_risk)
+  predict_risk() |>
+  select(patient_id, linear_predictor, baseline_risk, arpi_risk)
 ```
 
 ## Treatment effects
@@ -67,7 +67,7 @@ Both functions check the inputs before predicting. Missing or impossible values 
 #| error: true
 patients |>
   mutate(hemoglobin = if_else(patient_id == "P1", -1, hemoglobin)) |>
-  predict_baseline_risk()
+  predict_risk()
 ```
 
 Values outside the range in the trial data give a warning, because their estimates are extrapolations.
@@ -75,7 +75,7 @@ Values outside the range in the trial data give a warning, because their estimat
 ```{r}
 patients |>
   mutate(hemoglobin = if_else(patient_id == "P2", 50, hemoglobin)) |>
-  predict_baseline_risk() |>
+  predict_risk(treatment = "adt") |>
   select(patient_id, hemoglobin, baseline_risk)
 ```
 

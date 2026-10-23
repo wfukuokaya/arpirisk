@@ -1,7 +1,15 @@
-#' Predict baseline risk of death
+#' Predict risk of death with ADT alone or with an ARPI plus ADT
 #'
 #' Adds each patient's linear predictor and predicted risk of death within 4
-#' years with androgen deprivation therapy (ADT) alone, called baseline risk.
+#' years with androgen deprivation therapy (ADT) alone, called baseline risk,
+#' with an androgen receptor pathway inhibitor (ARPI) plus ADT, or both.
+#'
+#' The risk with an ARPI plus ADT is the baseline risk minus the absolute risk
+#' difference at that baseline risk, the `ard` estimate of
+#' [estimate_treatment_effect()]. It therefore reflects how the treatment
+#' effect varies with baseline risk, not a constant hazard ratio. For baseline
+#' risks outside the range in which effects were estimated, the effect at the
+#' nearest edge of that range is used, with a warning.
 #'
 #' Inputs are checked first. Missing or invalid values stop with an error that
 #' names the row and input. Values outside the range in the trial data give a
@@ -14,11 +22,14 @@
 #'   `bone_metastases` (a count, or a category code `"0-3"`, `"4-6"`,
 #'   `"7-10"`, or `"11+"`), `psa` (ng/mL), `hemoglobin` (g/L), `albumin`
 #'   (g/L), `alp` (U/L), and `ldh` (U/L). Other columns are kept unchanged.
+#' @param treatment Treatments to predict risk for: `"adt"`, ADT alone, and
+#'   `"arpi"`, an ARPI plus ADT.
 #' @inheritParams model_inputs
 #'
-#' @return `newdata` with two columns added: `linear_predictor`, the model's
-#'   risk score, and `baseline_risk`, the predicted 4-year risk of death as a
-#'   proportion. Existing columns with these names are replaced.
+#' @return `newdata` with `linear_predictor`, the model's risk score, and, for
+#'   each treatment in the order requested, the predicted 4-year risk of death
+#'   as a proportion: `baseline_risk` for ADT alone and `arpi_risk` for an ARPI
+#'   plus ADT. Existing columns with these names are replaced.
 #' @examples
 #' # Your own patient data: one row per patient, one column per input, plus any
 #' # other columns, which are kept.
@@ -28,16 +39,56 @@
 #'   bone_metastases = c(8, 15), psa = c(45, 150), hemoglobin = c(128, 115),
 #'   albumin = c(41, 38), alp = c(180, 420), ldh = c(210, 280)
 #' )
-#' risk <- predict_baseline_risk(patients)
-#' risk[c("patient_id", "baseline_risk")]
+#'
+#' # Risk with ADT alone and with an ARPI plus ADT
+#' risk <- predict_risk(patients)
+#' risk[c("patient_id", "baseline_risk", "arpi_risk")]
+#'
+#' # Risk with ADT alone only
+#' predict_risk(patients, treatment = "adt")
 #' @export
-predict_baseline_risk <- function(newdata, model = mhspc_model()) {
+predict_risk <- function(newdata, treatment = c("adt", "arpi"), model = mhspc_model()) {
   check_model(model)
+  treatment <- unique(match.arg(treatment, several.ok = TRUE))
   assessment <- prepare_inputs(newdata, model)
   lp <- linear_predictor(assessment$values, model)
+  baseline_risk <- absolute_risk(lp, model)
+  if ("arpi" %in% treatment) {
+    warn_outside_effect_range(lp, model)
+  }
   newdata$linear_predictor <- lp
-  newdata$baseline_risk <- absolute_risk(lp, model)
-  newdata
+  columns <- c(adt = "baseline_risk", arpi = "arpi_risk")
+  purrr::reduce(treatment, function(data, arm) {
+    data[[columns[[arm]]]] <- if (arm == "adt") {
+      baseline_risk
+    } else {
+      baseline_risk - effect_at_lp(lp, model, "ard")$estimate
+    }
+    data
+  }, .init = newdata)
+}
+
+#' Predict baseline risk of death
+#'
+#' @description
+#' Deprecated: use [predict_risk()] with `treatment = "adt"`, which returns
+#' the same columns.
+#'
+#' @inheritParams predict_risk
+#' @return `newdata` with `linear_predictor` and `baseline_risk` added.
+#' @keywords internal
+#' @export
+predict_baseline_risk <- function(newdata, model = mhspc_model()) {
+  cli::cli_warn(
+    c(
+      "{.fn predict_baseline_risk} was deprecated in arpirisk 0.2.0.",
+      i = "Use {.code predict_risk(treatment = \"adt\")} instead."
+    ),
+    class = "arpirisk_deprecated_warning",
+    .frequency = "regularly",
+    .frequency_id = "arpirisk_predict_baseline_risk"
+  )
+  predict_risk(newdata, treatment = "adt", model = model)
 }
 
 #' Estimate treatment effects at a patient's baseline risk
@@ -49,9 +100,9 @@ predict_baseline_risk <- function(newdata, model = mhspc_model()) {
 #' Positive absolute effects indicate gains with an ARPI. For baseline risks
 #' outside the range in which effects were estimated, the effect at the nearest
 #' edge of that range is returned, with a warning. Inputs are checked as in
-#' [predict_baseline_risk()].
+#' [predict_risk()].
 #'
-#' @inheritParams predict_baseline_risk
+#' @inheritParams predict_risk
 #' @param scale Effects to add: `"ard"`, the difference in the probability of
 #'   being alive at 4 years; `"rmst"`, the difference in restricted mean
 #'   survival time through 4 years, in months; `"hr"`, the hazard ratio for
