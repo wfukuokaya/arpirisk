@@ -52,14 +52,7 @@
 </h1></div>
 <!-- badges: start -->
 
-<p>Risk-based treatment effects of androgen receptor pathway inhibitors (ARPIs) in metastatic hormone-sensitive prostate cancer (mHSPC), from individual participant data of 4706 patients in LATITUDE, ARCHES, TITAN, and ARASENS.</p>
-<ul>
-<li>
-<strong>Baseline risk</strong>: the 4-year risk of all-cause death with androgen deprivation therapy (ADT) alone, from 9 routinely available patient characteristics.</li>
-<li>
-<strong>Treatment effects</strong> of adding an ARPI to ADT at that risk: additional patients alive at 4 years, additional months alive over 4 years, and the hazard ratio for death, each with a 95% confidence interval.</li>
-</ul>
-<p>For research and education; not a medical device. The web calculator is at <a href="https://github.com/wfukuokaya/arpirisk-app" class="external-link uri">https://github.com/wfukuokaya/arpirisk-app</a>.</p>
+<p>arpirisk predicts the 4-year risk of all-cause death with androgen deprivation therapy (ADT) alone, called baseline risk, in metastatic hormone-sensitive prostate cancer (mHSPC), and estimates the treatment effects of adding an androgen receptor pathway inhibitor (ARPI) at that baseline risk. Both prediction functions take a data frame with one row per patient and return it with the results added as new columns.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -69,26 +62,144 @@
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
-<p>Give a data frame with one row per patient and one column per input (see <code><a href="reference/model_inputs.html">model_inputs()</a></code>). Each function returns the same data frame with its results added as new columns, so they stay next to each patient.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/wfukuokaya/arpirisk" class="external-link">arpirisk</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="inputs">Inputs<a class="anchor" aria-label="anchor" href="#inputs"></a>
+</h2>
+<p><code><a href="reference/model_inputs.html">model_inputs()</a></code> lists the 9 inputs with their column names, units, and accepted values. <code>example_patients</code> contains 6 synthetic patients spanning the range of baseline risk.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/model_inputs.html">model_inputs</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">name</span>, <span class="va">unit</span>, <span class="va">accepted</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                  name  unit                                            accepted</span></span>
+<span><span class="co">#&gt; 1             ecog_ps  &lt;NA&gt;                                             0, 1, 2</span></span>
+<span><span class="co">#&gt; 2       gleason_score  &lt;NA&gt;                          2, 3, 4, 5, 6, 7, 8, 9, 10</span></span>
+<span><span class="co">#&gt; 3 visceral_metastasis  &lt;NA&gt;                                                0, 1</span></span>
+<span><span class="co">#&gt; 4     bone_metastases count Count, or category code "0-3", "4-6", "7-10", "11+"</span></span>
+<span><span class="co">#&gt; 5                 psa ng/mL                                        0 to 100,000</span></span>
+<span><span class="co">#&gt; 6          hemoglobin   g/L                                           20 to 250</span></span>
+<span><span class="co">#&gt; 7             albumin   g/L                                            10 to 70</span></span>
+<span><span class="co">#&gt; 8                 alp   U/L                                         0 to 10,000</span></span>
+<span><span class="co">#&gt; 9                 ldh   U/L                                         0 to 10,000</span></span>
 <span></span>
-<span><span class="va">patients</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  patient_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"B"</span><span class="op">)</span>,</span>
-<span>  ecog_ps <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, gleason_score <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">9</span>, <span class="fl">9</span><span class="op">)</span>, visceral_metastasis <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>,</span>
-<span>  bone_metastases <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">8</span>, <span class="fl">15</span><span class="op">)</span>, psa <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">45</span>, <span class="fl">150</span><span class="op">)</span>, hemoglobin <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">128</span>, <span class="fl">115</span><span class="op">)</span>,</span>
-<span>  albumin <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">41</span>, <span class="fl">38</span><span class="op">)</span>, alp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">180</span>, <span class="fl">420</span><span class="op">)</span>, ldh <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">210</span>, <span class="fl">280</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># 4-year risk of death with ADT alone and with an ARPI plus ADT</span></span>
-<span><span class="va">risk</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/predict_risk.html">predict_risk</a></span><span class="op">(</span><span class="va">patients</span><span class="op">)</span></span>
-<span><span class="va">risk</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"patient_id"</span>, <span class="st">"baseline_risk"</span>, <span class="st">"arpi_risk"</span><span class="op">)</span><span class="op">]</span></span>
-<span></span>
-<span><span class="co"># Difference in the proportion alive at 4 years with an ARPI, with 95% CI</span></span>
-<span><span class="va">effects</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/estimate_treatment_effect.html">estimate_treatment_effect</a></span><span class="op">(</span><span class="va">patients</span>, scale <span class="op">=</span> <span class="st">"ard"</span><span class="op">)</span></span>
-<span><span class="va">effects</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"patient_id"</span>, <span class="st">"ard"</span>, <span class="st">"ard_conf_low"</span>, <span class="st">"ard_conf_high"</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
-<p>Risks and absolute risk differences are proportions: an <code>ard</code> of 0.16 means 16 more patients alive at 4 years per 100 treated.</p>
-<p>See <code><a href="articles/arpirisk.html">vignette("arpirisk")</a></code> for a worked example.</p>
+<span><span class="va">patients</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="va">example_patients</span><span class="op">)</span></span>
+<span><span class="va">patients</span></span>
+<span><span class="co">#&gt; # A tibble: 6 × 10</span></span>
+<span><span class="co">#&gt;   patient_id ecog_ps gleason_score visceral_metastasis bone_metastases   psa</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;        &lt;dbl&gt;         &lt;dbl&gt;               &lt;dbl&gt;           &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 P1               0             7                   0               0     5</span></span>
+<span><span class="co">#&gt; 2 P2               0             8                   0               2    12</span></span>
+<span><span class="co">#&gt; 3 P3               0             9                   0               8    45</span></span>
+<span><span class="co">#&gt; 4 P4               1             9                   0              15   150</span></span>
+<span><span class="co">#&gt; 5 P5               1             8                   1               5    30</span></span>
+<span><span class="co">#&gt; 6 P6               2            10                   1              30   800</span></span>
+<span><span class="co">#&gt; # ℹ 4 more variables: hemoglobin &lt;dbl&gt;, albumin &lt;dbl&gt;, alp &lt;dbl&gt;, ldh &lt;dbl&gt;</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="predicted-risk">Predicted risk<a class="anchor" aria-label="anchor" href="#predicted-risk"></a>
+</h2>
+<p><code><a href="reference/predict_risk.html">predict_risk()</a></code> adds the linear predictor and the 4-year risk of death with ADT alone (<code>baseline_risk</code>) and with an ARPI plus ADT (<code>arpi_risk</code>) to the patient data. The risk with an ARPI is the baseline risk minus the absolute risk difference at that baseline risk, so it follows the treatment effects described below and gives the same warning for baseline risks outside the range in which effects were estimated. Use <code>treatment = "adt"</code> or <code>treatment = "arpi"</code> to add only one of the two risks.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">patients</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/predict_risk.html">predict_risk</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">patient_id</span>, <span class="va">linear_predictor</span>, <span class="va">baseline_risk</span>, <span class="va">arpi_risk</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: 1 patient has a baseline risk outside the range in which treatment effects were</span></span>
+<span><span class="co">#&gt; estimated (19% to 96%).</span></span>
+<span><span class="co">#&gt; ℹ Their effects are taken at the nearest edge of that range.</span></span>
+<span><span class="co">#&gt; ℹ Row: 6.</span></span>
+<span><span class="co">#&gt; # A tibble: 6 × 4</span></span>
+<span><span class="co">#&gt;   patient_id linear_predictor baseline_risk arpi_risk</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;                 &lt;dbl&gt;         &lt;dbl&gt;     &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 P1                   -0.658         0.196     0.196</span></span>
+<span><span class="co">#&gt; 2 P2                   -0.395         0.248     0.192</span></span>
+<span><span class="co">#&gt; 3 P3                    0.819         0.616     0.460</span></span>
+<span><span class="co">#&gt; 4 P4                    1.68          0.896     0.768</span></span>
+<span><span class="co">#&gt; 5 P5                    1.51          0.852     0.718</span></span>
+<span><span class="co">#&gt; 6 P6                    2.29          0.985     0.872</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="treatment-effects">Treatment effects<a class="anchor" aria-label="anchor" href="#treatment-effects"></a>
+</h2>
+<p><code><a href="reference/estimate_treatment_effect.html">estimate_treatment_effect()</a></code> adds the baseline risk and, for each requested scale, the estimate with its 95% confidence interval: the difference in the proportion of patients alive at 4 years (<code>ard</code>), the difference in restricted mean survival time through 4 years in months (<code>rmst</code>), and the hazard ratio for death (<code>hr</code>). A warning names the patients whose baseline risk lies outside the range in which effects were estimated; their effects are taken at the nearest edge of that range.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">effects</span> <span class="op">&lt;-</span> <span class="va">patients</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/estimate_treatment_effect.html">estimate_treatment_effect</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: 1 patient has a baseline risk outside the range in which treatment effects were</span></span>
+<span><span class="co">#&gt; estimated (19% to 96%).</span></span>
+<span><span class="co">#&gt; ℹ Their effects are taken at the nearest edge of that range.</span></span>
+<span><span class="co">#&gt; ℹ Row: 6.</span></span>
+<span><span class="va">effects</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">patient_id</span>, <span class="va">baseline_risk</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ard"</span>, <span class="st">"rmst"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 6 × 8</span></span>
+<span><span class="co">#&gt;   patient_id baseline_risk      ard ard_conf_low ard_conf_high  rmst</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;              &lt;dbl&gt;    &lt;dbl&gt;        &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 P1                 0.196 0.000283    -0.0945          0.0951 0.618</span></span>
+<span><span class="co">#&gt; 2 P2                 0.248 0.0557       0.000993        0.110  0.999</span></span>
+<span><span class="co">#&gt; 3 P3                 0.616 0.156        0.104           0.209  5.04 </span></span>
+<span><span class="co">#&gt; 4 P4                 0.896 0.128        0.0643          0.191  3.95 </span></span>
+<span><span class="co">#&gt; 5 P5                 0.852 0.134        0.0804          0.188  4.36 </span></span>
+<span><span class="co">#&gt; 6 P6                 0.985 0.113        0.0146          0.212  2.99 </span></span>
+<span><span class="co">#&gt; # ℹ 2 more variables: rmst_conf_low &lt;dbl&gt;, rmst_conf_high &lt;dbl&gt;</span></span></code></pre></div>
+<p>For reporting, express the risk and the absolute risk difference per 100 patients.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">effects</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">baseline_risk</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"ard"</span><span class="op">)</span><span class="op">)</span>, \<span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fl">100</span> <span class="op">*</span> <span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">patient_id</span>, <span class="va">baseline_risk</span>, <span class="va">ard</span>, <span class="va">ard_conf_low</span>, <span class="va">ard_conf_high</span>, <span class="va">hr</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 6 × 6</span></span>
+<span><span class="co">#&gt;   patient_id baseline_risk   ard ard_conf_low ard_conf_high    hr</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;              &lt;dbl&gt; &lt;dbl&gt;        &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 P1                    20     0           -9            10 0.755</span></span>
+<span><span class="co">#&gt; 2 P2                    25     6            0            11 0.708</span></span>
+<span><span class="co">#&gt; 3 P3                    62    16           10            21 0.604</span></span>
+<span><span class="co">#&gt; 4 P4                    90    13            6            19 0.685</span></span>
+<span><span class="co">#&gt; 5 P5                    85    13            8            19 0.664</span></span>
+<span><span class="co">#&gt; 6 P6                    98    11            1            21 0.736</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="input-checks">Input checks<a class="anchor" aria-label="anchor" href="#input-checks"></a>
+</h2>
+<p>Both functions check the inputs before predicting. Missing or impossible values stop with an error that names the row and input.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">patients</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>hemoglobin <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">patient_id</span> <span class="op">==</span> <span class="st">"P1"</span>, <span class="op">-</span><span class="fl">1</span>, <span class="va">hemoglobin</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/predict_risk.html">predict_risk</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error in `predict_risk()`:</span></span>
+<span><span class="co">#&gt; ! `newdata` has invalid or missing values.</span></span>
+<span><span class="co">#&gt; ✖ Row 1: Hemoglobin must be between 20 and 250 g/L.</span></span></code></pre></div>
+<p>Values outside the range in the trial data give a warning, because their estimates are extrapolations.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">patients</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>hemoglobin <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">patient_id</span> <span class="op">==</span> <span class="st">"P2"</span>, <span class="fl">50</span>, <span class="va">hemoglobin</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/predict_risk.html">predict_risk</a></span><span class="op">(</span>treatment <span class="op">=</span> <span class="st">"adt"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">patient_id</span>, <span class="va">hemoglobin</span>, <span class="va">baseline_risk</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: Some values are outside the range in the trial data; their estimates are</span></span>
+<span><span class="co">#&gt; extrapolations.</span></span>
+<span><span class="co">#&gt; ! Row 2: Hemoglobin of 50 g/L is outside the range in the trial data (57 to 186</span></span>
+<span><span class="co">#&gt;   g/L); the estimate is an extrapolation.</span></span>
+<span><span class="co">#&gt; # A tibble: 6 × 3</span></span>
+<span><span class="co">#&gt;   patient_id hemoglobin baseline_risk</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;           &lt;dbl&gt;         &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 P1                150         0.196</span></span>
+<span><span class="co">#&gt; 2 P2                 50         0.651</span></span>
+<span><span class="co">#&gt; 3 P3                128         0.616</span></span>
+<span><span class="co">#&gt; 4 P4                115         0.896</span></span>
+<span><span class="co">#&gt; 5 P5                120         0.852</span></span>
+<span><span class="co">#&gt; 6 P6                105         0.985</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="model-specification">Model specification<a class="anchor" aria-label="anchor" href="#model-specification"></a>
+</h2>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/mhspc_model.html">mhspc_model</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; mHSPC ARPI treatment-effect model (261002-raw-rcs)</span></span>
+<span><span class="co">#&gt; • Baseline risk: All-cause death within 4 years with ADT alone.</span></span>
+<span><span class="co">#&gt; • Inputs: ecog_ps, gleason_score, visceral_metastasis, bone_metastases, psa,</span></span>
+<span><span class="co">#&gt;   hemoglobin, albumin, alp, and ldh.</span></span>
+<span><span class="co">#&gt; • Treatment effects of ARPI plus ADT: survival difference, restricted mean</span></span>
+<span><span class="co">#&gt;   survival time difference, and hazard ratio.</span></span></code></pre></div>
+<p>The specification is at <code>system.file("extdata", "model_spec.json", package = "arpirisk")</code>.</p>
 </div>
 <div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
