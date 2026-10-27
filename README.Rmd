@@ -1,0 +1,46 @@
+---
+output:
+  github_document:
+    pandoc_args: ["--wrap=preserve"]
+---
+
+<!-- README.md is generated from README.Rmd, which knits the body of vignettes/arpirisk.qmd. Edit the vignette, then run rmarkdown::render("README.Rmd"). -->
+
+```{r}
+#| include: false
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+vignette_lines <- readLines("vignettes/arpirisk.qmd")
+vignette_body <- vignette_lines[-seq_len(which(vignette_lines == "---")[2])]
+first_chunk <- grep("^```\\{r", vignette_body)[1]
+knit_body <- function(lines) knitr::knit_child(text = lines, quiet = TRUE, envir = globalenv())
+```
+
+# arpirisk
+
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/wfukuokaya/arpirisk/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/wfukuokaya/arpirisk/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
+```{r}
+#| echo: false
+#| results: asis
+cat(knit_body(vignette_body[seq_len(first_chunk - 1)]))
+```
+
+## Installation
+
+```r
+pak::pak("wfukuokaya/arpirisk")
+```
+
+## Usage
+
+```{r}
+#| echo: false
+#| results: asis
+cat(knit_body(vignette_body[first_chunk:length(vignette_body)]))
+```
+
+## Citation
+
+Methods and model performance are described in our article: `citation("arpirisk")`. The article will be added on publication.
